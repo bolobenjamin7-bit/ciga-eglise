@@ -354,30 +354,30 @@ textarea.finp{resize:vertical;min-height:65px;}
   <!-- TAB 0 : DIMES -->
   <div id="ftab0">
     <div class="card" style="border-top:3px solid #16a34a">
-      <div class="ctitle" style="color:#16a34a">&#128176; Dimes du mois</div>
-      <p style="font-size:0.78rem;color:#888;margin-bottom:1rem">Cochez Oui ou Non pour chaque membre</p>
-      <div id="dimeCheckList"></div>
-    </div>
-    <div class="card">
-      <div class="ctitle">Don manuel</div>
+      <div class="ctitle" style="color:#16a34a">&#128176; Enregistrer une dime</div>
       <div class="fgrid">
         <div class="ffield"><label class="flbl">Membre</label><select id="fmem" class="finp"><option value="">Selectionner</option></select></div>
         <div class="ffield"><label class="flbl">Montant (FCFA)</label><input type="number" id="famtin" class="finp" placeholder="5000"></div>
+        <div class="ffield"><label class="flbl">Date</label><input type="date" id="fdimdate" class="finp"></div>
       </div>
-      <div class="brow"><button class="btn bgrn" id="btnaddin">Enregistrer don</button></div>
+      <div class="brow"><button class="btn bgrn" id="btnaddin">&#128176; Enregistrer la dime</button></div>
+    </div>
+    <div class="card">
+      <div class="ctitle" style="color:#16a34a">Liste des dimes</div>
+      <div id="dimeList"><div class="empty">Aucune dime enregistree</div></div>
     </div>
   </div>
 
   <!-- TAB 1 : OFFRANDES PAR DIMANCHE -->
   <div id="ftab1" style="display:none">
     <div class="card" style="border-top:3px solid #8b5cf6">
-      <div class="ctitle" style="color:#8b5cf6">&#129309; Offrande du Dimanche</div>
-      <p style="font-size:0.78rem;color:#888;margin-bottom:1rem">Enregistrez le montant de l'offrande collectee chaque dimanche</p>
+      <div class="ctitle" style="color:#8b5cf6">&#129309; Enregistrer une offrande</div>
       <div class="fgrid">
-        <div class="ffield"><label class="flbl">Date du dimanche</label><input type="date" id="offDate" class="finp"></div>
-        <div class="ffield"><label class="flbl">Montant total (FCFA)</label><input type="number" id="offMontant" class="finp" placeholder="Ex: 150000"></div>
+        <div class="ffield"><label class="flbl">Membre (optionnel)</label><select id="offMembre" class="finp"><option value="">-- General / Collecte --</option></select></div>
+        <div class="ffield"><label class="flbl">Date</label><input type="date" id="offDate" class="finp"></div>
+        <div class="ffield"><label class="flbl">Montant (FCFA)</label><input type="number" id="offMontant" class="finp" placeholder="Ex: 5000"></div>
       </div>
-      <div class="ffield"><label class="flbl">Note (optionnel)</label><input type="text" id="offNote" class="finp" placeholder="Ex: Culte dominical, Evangelisation..."></div>
+      <div class="ffield"><label class="flbl">Note (optionnel)</label><input type="text" id="offNote" class="finp" placeholder="Ex: Culte dominical, Action de grace..."></div>
       <div class="brow"><button class="btn" style="background:#8b5cf6;color:#fff" id="btnAddOff">+ Enregistrer offrande</button></div>
     </div>
     <!-- CALENDRIER OFFRANDES -->
@@ -564,7 +564,10 @@ textarea.finp{resize:vertical;min-height:65px;}
     </div>
   </div>
   <div class="card">
-    <div class="ctitle">&#128203; Historique des connexions</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem">
+      <div class="ctitle" style="margin:0">&#128203; Historique des connexions</div>
+      <button class="btn bred bsm" id="btnClearHistory">&#128465; Supprimer historique</button>
+    </div>
     <p style="font-size:0.78rem;color:#888;margin-bottom:0.8rem">Qui a visite l'application et quand</p>
     <div id="loginHistoryList"><div class="empty">Aucune connexion enregistree</div></div>
   </div>
@@ -819,10 +822,11 @@ function loadDB() {
 }
 
 function syncFromFirebase() {
+  try{
   var keys = ['members','attendance','finances','committees','events','books','docs'];
   var lsKeys = ['ciga_m','ciga_a','ciga_f','ciga_c','ciga_e','ciga_bk','ciga_docs'];
   keys.forEach(function(key, i) {
-    rtdb.ref(key).on('value', function(snap) {
+    try{rtdb.ref(key).on('value', function(snap) {
       var val = snap.val();
       if(val) {
         if(Array.isArray(val)) { db[key] = val; }
@@ -830,9 +834,9 @@ function syncFromFirebase() {
       } else { db[key] = []; }
       try { localStorage.setItem(lsKeys[i], JSON.stringify(db[key])); } catch(e) {}
       try { goPage(currentPage); } catch(e) {}
-    });
+    });}catch(ee){}
   });
-  rtdb.ref('config').on('value', function(snap) {
+  try{rtdb.ref('config').on('value', function(snap) {
     var val = snap.val();
     if(val) {
       if(val.name) cfg.name = val.name;
@@ -842,7 +846,8 @@ function syncFromFirebase() {
       if(val.dash) cfg.dash = Object.assign({}, cfg.dash, val.dash);
       applyConfig();
     }
-  });
+  });}catch(ee){}
+  }catch(eee){console.warn('Firebase unavailable');}
 }
 
 var currentPage = 0;
@@ -863,11 +868,13 @@ function saveDB() {
 }
 
 function saveToFirebase() {
+  try{
   var keys = ['members','attendance','finances','committees','events','books','docs'];
   keys.forEach(function(key) {
-    rtdb.ref(key).set(db[key]);
+    try{rtdb.ref(key).set(db[key]);}catch(e){}
   });
-  rtdb.ref('config').set(cfg);
+  try{rtdb.ref('config').set(cfg);}catch(e){}
+  }catch(e){}
 }
 
 function toast(msg) {
@@ -1122,9 +1129,12 @@ function addFin(type) {
     if(!uid){toast('Selectionnez un membre');return;}
     if(!amt||amt<=0){toast('Montant invalide');return;}
     var ft=document.getElementById('ftype').value;
+    var dateEl=document.getElementById('fdimdate');
+    var fdate=dateEl&&dateEl.value?dateEl.value:new Date().toISOString().split('T')[0];
     var m=null; for(var i=0;i<db.members.length;i++) if(db.members[i].uid===uid){m=db.members[i];break;}
-    db.finances.push({id:Date.now(),type:'in',ft:ft,muid:uid,mname:m?m.nom+' '+m.prenom:'',amount:amt,date:new Date().toISOString().split('T')[0]});
+    db.finances.push({id:Date.now(),type:'in',ft:'Dime',muid:uid,mname:m?m.nom+' '+m.prenom:'',amount:amt,date:fdate});
     document.getElementById('famtin').value='';
+    if(dateEl)dateEl.value='';
   } else {
     var motif=document.getElementById('fmotif').value.trim();
     var amt=parseFloat(document.getElementById('famtout').value);
@@ -1141,6 +1151,21 @@ function delFin(id) {
     db.finances=db.finances.filter(function(f){return f.id!==id;});
     saveDB(); renderFin(); toast('Supprime');
   });
+}
+
+function renderDimeList2(){
+  var el=document.getElementById('dimeList'); if(!el)return;
+  var dimes=db.finances.filter(function(f){return f.ft==='Dime'&&f.type==='in';});
+  dimes.sort(function(a,b){return(b.date||'').localeCompare(a.date||'');});
+  if(!dimes.length){el.innerHTML='<div class="empty">Aucune dime enregistree</div>';return;}
+  var total=0; dimes.forEach(function(d){total+=Number(d.amount||0);});
+  var h='<div style="font-weight:700;color:#16a34a;margin-bottom:0.5rem;font-size:0.85rem">Total: '+total.toLocaleString()+' FCFA</div>';
+  dimes.forEach(function(d){
+    h+='<div class="litem"><div><div class="ltitle">'+d.mname+'</div><div class="lsub">'+d.date+'</div></div>'
+      +'<div style="display:flex;align-items:center;gap:0.5rem"><span style="font-weight:700;color:#16a34a">+'+Number(d.amount||0).toLocaleString()+' FCFA</span>'
+      +'<button class="btn bred bsm" data-id="'+d.id+'" data-act="delfin">X</button></div></div>';
+  });
+  el.innerHTML=h;
 }
 
 function renderFin() {
@@ -1175,6 +1200,7 @@ function renderFin() {
       +'<button class="btn bred bsm" data-id="'+f.id+'" data-act="delfin">X</button></div></div>';
   }
   document.getElementById('flist').innerHTML=h;
+  renderDimeList2();
 }
 
 // ── COMITES ──
@@ -1372,6 +1398,8 @@ function fillSelects(){
   for(var i=0;i<db.members.length;i++){var m=db.members[i];opts+='<option value="'+m.uid+'">'+m.nom+' '+m.prenom+' ('+m.id+')</option>';}
   var ids=['attm','fmem'];
   for(var i=0;i<ids.length;i++){var el=document.getElementById(ids[i]);if(el)el.innerHTML=opts;}
+  var offM=document.getElementById('offMembre');
+  if(offM){offM.innerHTML='<option value="">-- General --</option>'+opts.replace('<option value="">Selectionner</option>','');}
 }
 
 // ── QR CODE ──
@@ -1653,7 +1681,9 @@ function loadPortalCal(){
 
 // ── INIT & EVENTS ──
 loadDB();
-document.getElementById('attdate').value = new Date().toISOString().split('T')[0];
+document.getElementById('attdate').value=new Date().toISOString().split('T')[0];
+var _fdd=document.getElementById('fdimdate');if(_fdd)_fdd.value=new Date().toISOString().split('T')[0];
+var _odd=document.getElementById('offDate');if(_odd)_odd.value=new Date().toISOString().split('T')[0];
 renderDocs();
 
 // ── MULTI-ADMIN & HISTORY ──
@@ -1748,11 +1778,7 @@ function doMemberLogin(){
 
 function openMemberPortalDirect(m){
   document.getElementById('mportal').classList.add('open');
-  loadPortalProfile(m);
-  loadPortalPresence(m);
-  loadPortalFinance(m);
-  loadPortalBooks();
-  loadPortalCal();
+  loadPortal(m);
 }
 
 document.getElementById('loginbtn').addEventListener('click', doAdminLogin);
@@ -1803,6 +1829,15 @@ document.addEventListener('click',function(e){
 });
 
 // Render admin list and history when config page opens
+document.addEventListener('click',function(e){
+  if(e.target.id==='btnClearHistory'){
+    if(confirm('Supprimer tout l\'historique?')){
+      localStorage.removeItem('ciga_history');
+      renderLoginHistory();toast('Historique supprime');
+    }
+  }
+});
+
 var _origRenderCfg2=renderCfg;
 renderCfg=function(){
   _origRenderCfg2();
@@ -2081,16 +2116,24 @@ document.getElementById('offCalNext').addEventListener('click',function(){offMon
 
 document.getElementById('btnAddOff').addEventListener('click',function(){
   var date=document.getElementById('offDate').value;
-  var montant=parseInt(document.getElementById('offMontant').value);
+  var montant=parseInt(document.getElementById('offMontant').value||'0');
   var note=document.getElementById('offNote').value.trim();
+  var memSel=document.getElementById('offMembre');
+  var muid=memSel?parseInt(memSel.value)||0:0;
+  var mname='';
+  if(muid){for(var i=0;i<db.members.length;i++)if(db.members[i].uid===muid){mname=db.members[i].nom+' '+db.members[i].prenom;break;}}
   if(!date){toast('Selectionnez une date');return;}
   if(!montant||montant<=0){toast('Entrez un montant valide');return;}
-  if(!db.offrandes) db.offrandes=[];
-  db.offrandes.push({id:Date.now(),date:date,montant:montant,note:note});
-  saveDB(); renderOffCalendar();
+  if(!db.offrandes)db.offrandes=[];
+  db.offrandes.push({id:Date.now(),date:date,montant:montant,note:note,muid:muid,mname:mname});
+  if(muid&&mname){
+    db.finances.push({id:Date.now()+1,type:'in',ft:'Offrande',muid:muid,mname:mname,amount:montant,date:date,note:note});
+  }
+  saveDB();renderOffCalendar();renderFin();
   document.getElementById('offMontant').value='';
   document.getElementById('offNote').value='';
-  toast('Offrande enregistree ✓');
+  if(memSel)memSel.value='';
+  toast('Offrande enregistree');
 });
 function renderDimeList(){
   var el=document.getElementById('dimeCheckList');
