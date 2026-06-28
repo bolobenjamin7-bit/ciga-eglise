@@ -1731,6 +1731,7 @@ function switchLibTab(tab){
 function loadPortalBooks(){
   var q=(document.getElementById('pbsrch')?document.getElementById('pbsrch').value:'').toLowerCase();
   var ac={'Disponible':'#16a34a','Emprunte':'#ca8a04','En commande':'#888','Archive':'#dc2626'};
+  // LIVRES
   var h='';
   for(var i=0;i<db.books.length;i++){
     var b=db.books[i];
@@ -1746,14 +1747,13 @@ function loadPortalBooks(){
   }
   var bl=document.getElementById('pbooklist');
   if(bl)bl.innerHTML=h||'<div class="empty">Aucun livre disponible</div>';
-  // Load documents
+  // DOCUMENTS
   var dh='';
   if(db.docs&&db.docs.length){
     for(var i=0;i<db.docs.length;i++){
       var d=db.docs[i];
-      var icon=d.type&&d.type.indexOf('pdf')>=0?'&#128196;':'&#128196;';
       dh+='<div style="display:flex;align-items:center;gap:0.8rem;padding:0.7rem;background:#f9fafb;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:0.4rem">'
-        +'<div style="font-size:1.5rem">'+icon+'</div>'
+        +'<div style="font-size:1.5rem">&#128196;</div>'
         +'<div style="flex:1"><div style="font-weight:600;font-size:0.85rem">'+d.title+'</div>'
         +'<div style="font-size:0.72rem;color:#888">'+d.cat+' — '+d.date+'</div></div>'
         +(d.data?'<a href="'+d.data+'" download="'+d.name+'" style="background:#1e3a8a;color:#fff;border-radius:6px;padding:0.3rem 0.6rem;font-size:0.72rem;text-decoration:none">Telecharger</a>':'')
@@ -2036,9 +2036,12 @@ function loadPortalCal(){
 var _origLoadPortal=loadPortal;
 loadPortal=function(m){
   _origLoadPortal(m);
-  loadPortalDime(m);
-  loadPortalCal();
-  // Also refresh when Firebase updates
+  // Small delay to ensure DOM is rendered
+  setTimeout(function(){
+    loadPortalDime(m);
+    loadPortalCal();
+    loadPortalBooks();
+  },100);
   window._curPortalMember=m;
 };
 
