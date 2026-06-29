@@ -1,0 +1,2670 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CIGA</title>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyB0y11I0LLDVXA4bREu5023qgZNwBg5N70",
+  authDomain: "ciga-382fb.firebaseapp.com",
+  databaseURL: "https://ciga-382fb-default-rtdb.firebaseio.com",
+  projectId: "ciga-382fb",
+  storageBucket: "ciga-382fb.firebasestorage.app",
+  messagingSenderId: "1082460834519",
+  appId: "1:1082460834519:web:5e0b293911307ba6b33e92"
+};
+firebase.initializeApp(firebaseConfig);
+const rtdb = firebase.database();
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,sans-serif;}
+body{background:#f0f4f8;color:#1a202c;}
+.hide{display:none!important;}
+#login-screen{position:fixed;inset:0;background:#1e3a8a;display:flex;align-items:center;justify-content:center;z-index:9999;padding:1rem;}
+.lbox{background:#fff;padding:2rem;border-radius:12px;width:100%;max-width:360px;text-align:center;}
+.lbox h2{color:#1e3a8a;margin-bottom:0.25rem;}
+.lbox p{color:#888;font-size:0.8rem;margin-bottom:1.2rem;}
+.lerr{color:red;font-size:0.8rem;margin-top:0.5rem;display:none;}
+#app-header{background:#1e3a8a;color:#fff;padding:0.8rem 1.2rem;display:flex;align-items:center;gap:0.8rem;}
+#hlogo{width:36px;height:36px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;font-size:1rem;overflow:hidden;cursor:pointer;background:rgba(255,255,255,0.2);}
+#hlogo img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+#hname{font-size:1rem;font-weight:700;flex:1;}
+.hbtn{background:rgba(255,255,255,0.2);color:#fff;border:1px solid rgba(255,255,255,0.4);padding:0.3rem 0.7rem;border-radius:5px;cursor:pointer;font-size:0.75rem;margin-left:0.3rem;}
+#app-nav{background:#162d6e;display:flex;overflow-x:auto;}
+#app-nav::-webkit-scrollbar{display:none;}
+.ntab{background:none;border:none;color:rgba(255,255,255,0.6);padding:0 1rem;height:40px;cursor:pointer;font-size:0.78rem;white-space:nowrap;border-bottom:2px solid transparent;}
+.ntab:hover{color:#fff;}
+.ntab.active{color:#fff;border-bottom-color:#60a5fa;}
+#app-content{max-width:1200px;margin:0 auto;padding:1.2rem;}
+.page{display:none;}
+.page.active{display:block;}
+.ptitle{font-size:1.4rem;font-weight:700;color:#1e3a8a;margin-bottom:0.2rem;}
+.psub{color:#888;font-size:0.8rem;margin-bottom:1.2rem;}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:1.2rem;margin-bottom:1rem;}
+.ctitle{font-size:0.95rem;font-weight:600;color:#1e3a8a;margin-bottom:0.8rem;}
+.flbl{display:block;font-size:0.72rem;font-weight:600;color:#374151;margin-bottom:0.25rem;}
+.finp{width:100%;background:#f9fafb;border:1px solid #d1d5db;border-radius:6px;padding:0.5rem 0.75rem;color:#1a202c;font-size:0.85rem;outline:none;}
+.finp:focus{border-color:#1e3a8a;}
+textarea.finp{resize:vertical;min-height:65px;}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:0.75rem;margin-bottom:0.9rem;}
+.ffield{display:flex;flex-direction:column;}
+.btn{display:inline-flex;align-items:center;gap:0.3rem;border:none;border-radius:6px;padding:0.5rem 1rem;font-size:0.8rem;font-weight:500;cursor:pointer;}
+.bblu{background:#1e3a8a;color:#fff;}
+.bblu:hover{background:#1e40af;}
+.bout{background:#fff;border:1px solid #1e3a8a;color:#1e3a8a;}
+.bout:hover{background:#eff6ff;}
+.bred{background:#fee2e2;color:#dc2626;border:1px solid #fca5a5;}
+.bred:hover{background:#dc2626;color:#fff;}
+.bgrn{background:#dcfce7;color:#16a34a;border:1px solid #86efac;}
+.bgrn:hover{background:#16a34a;color:#fff;}
+.bsm{padding:0.28rem 0.6rem;font-size:0.72rem;}
+.brow{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.8rem;}
+.kgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.8rem;margin-bottom:1.2rem;}
+.kbox{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:1rem;border-top:3px solid #1e3a8a;}
+.knum{font-size:2rem;font-weight:700;color:#1e3a8a;line-height:1.1;}
+.klbl{font-size:0.7rem;color:#888;margin-top:0.2rem;}
+.tbar{display:flex;gap:0.7rem;margin-bottom:1rem;flex-wrap:wrap;align-items:center;}
+.tbar .finp{flex:1;min-width:180px;}
+.mgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;}
+.mcard{background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;}
+.mctop{display:flex;gap:0.9rem;padding:1rem;border-bottom:1px solid #e2e8f0;align-items:flex-start;}
+.mav{width:56px;height:56px;border-radius:8px;background:linear-gradient(135deg,#1e3a8a,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:700;color:#fff;flex-shrink:0;}
+.mav img{width:56px;height:56px;border-radius:8px;object-fit:cover;}
+.mname{font-weight:600;font-size:0.9rem;}
+.mid{font-family:monospace;font-size:0.68rem;color:#1e3a8a;background:#eff6ff;padding:0.08rem 0.4rem;border-radius:3px;display:inline-block;margin-top:0.15rem;}
+.minfo{font-size:0.73rem;color:#888;margin-top:0.2rem;line-height:1.6;}
+.mcbody{padding:0.8rem 1rem;}
+.mbadges{display:flex;flex-wrap:wrap;gap:0.25rem;margin-bottom:0.6rem;}
+.mbtns{display:flex;gap:0.3rem;flex-wrap:wrap;}
+.bdg{display:inline-flex;align-items:center;font-size:0.67rem;padding:0.12rem 0.45rem;border-radius:99px;font-weight:500;}
+.bdg-b{background:#eff6ff;color:#1e3a8a;}
+.bdg-g{background:#dcfce7;color:#16a34a;}
+.bdg-r{background:#fee2e2;color:#dc2626;}
+.litem{display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0.8rem;background:#f9fafb;border:1px solid #e2e8f0;border-radius:7px;margin-bottom:0.4rem;}
+.ltitle{font-weight:500;font-size:0.85rem;}
+.lsub{font-size:0.73rem;color:#888;margin-top:0.1rem;}
+.fsum{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.8rem;background:#f9fafb;border:1px solid #e2e8f0;border-radius:10px;padding:1rem;margin-bottom:1rem;text-align:center;}
+.famt{font-size:1.5rem;font-weight:700;}
+.fbk{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:1rem;display:flex;gap:0.9rem;margin-bottom:0.8rem;border-left:4px solid #1e3a8a;}
+.bkcv{width:52px;height:70px;border-radius:6px;background:linear-gradient(135deg,#1e3a8a,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;}
+.evitem{display:flex;align-items:center;justify-content:space-between;padding:0.75rem 1rem;background:#fff;border:1px solid #e2e8f0;border-left:4px solid #1e3a8a;border-radius:7px;margin-bottom:0.5rem;}
+.mbk{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:500;align-items:center;justify-content:center;padding:1rem;}
+.mbk.open{display:flex;}
+.mbx{background:#fff;border-radius:12px;padding:1.5rem;width:100%;max-width:440px;max-height:88vh;overflow-y:auto;}
+.mbtitle{font-size:1rem;font-weight:700;color:#1e3a8a;margin-bottom:1rem;}
+.mbact{display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1rem;padding-top:0.8rem;border-top:1px solid #e2e8f0;}
+.cbk{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:600;align-items:center;justify-content:center;padding:1rem;}
+.cbk.open{display:flex;}
+.cbx{background:#fff;border-radius:12px;padding:1.5rem;max-width:360px;width:100%;text-align:center;}
+.cico{font-size:2.2rem;margin-bottom:0.6rem;}
+.ctit{font-size:1rem;font-weight:700;margin-bottom:0.4rem;}
+.cmsg{font-size:0.8rem;color:#888;margin-bottom:1rem;}
+.cbtns{display:flex;gap:0.6rem;justify-content:center;}
+.qrwrap{text-align:center;}
+.qriw{background:#fff;display:inline-block;padding:10px;border-radius:8px;border:2px solid #1e3a8a;}
+.qrtxt{font-family:monospace;font-size:0.68rem;color:#888;background:#f9fafb;border-radius:6px;padding:0.7rem;margin-top:0.7rem;white-space:pre-wrap;line-height:1.6;max-height:150px;overflow-y:auto;text-align:left;}
+#mportal{position:fixed;inset:0;background:#f0f4f8;z-index:8000;display:none;overflow-y:auto;}
+#mportal.open{display:block;}
+.phdr{background:linear-gradient(135deg,#1e3a8a,#3b82f6);color:#fff;padding:1rem 1.2rem;display:flex;align-items:center;gap:0.8rem;}
+.plogo{width:34px;height:34px;border-radius:50%;border:2px solid rgba(255,255,255,0.5);display:flex;align-items:center;justify-content:center;font-size:0.9rem;overflow:hidden;}
+.plogo img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.ptabs{background:#fff;border-bottom:1px solid #e2e8f0;display:flex;overflow-x:auto;}
+.ptabs::-webkit-scrollbar{display:none;}
+.ptab{background:none;border:none;color:#888;padding:0 1rem;height:40px;cursor:pointer;font-size:0.78rem;white-space:nowrap;border-bottom:2px solid transparent;}
+.ptab.active{color:#1e3a8a;border-bottom-color:#1e3a8a;font-weight:600;}
+.pbody{max-width:860px;margin:0 auto;padding:1.2rem;}
+.ppage{display:none;}
+.ppage.active{display:block;}
+.pbanner{height:70px;background:linear-gradient(135deg,#1e3a8a,#3b82f6);border-radius:10px 10px 0 0;}
+.pav{width:76px;height:76px;border-radius:50%;border:4px solid #fff;object-fit:cover;margin-top:-38px;display:block;}
+.pavtxt{width:76px;height:76px;border-radius:50%;border:4px solid #fff;background:linear-gradient(135deg,#1e3a8a,#3b82f6);display:flex;align-items:center;justify-content:center;font-size:1.6rem;font-weight:700;color:#fff;margin-top:-38px;}
+.sbox{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:0.9rem;text-align:center;border-top:3px solid #1e3a8a;}
+.snum{font-size:1.7rem;font-weight:700;color:#1e3a8a;}
+.slbl{font-size:0.7rem;color:#888;margin-top:0.15rem;}
+#pinscr{display:none;position:fixed;inset:0;background:linear-gradient(135deg,#1e3a8a,#3b82f6);z-index:8100;align-items:center;justify-content:center;padding:1rem;}
+#pinscr.open{display:flex;}
+.pinbox{background:#fff;border-radius:14px;padding:2rem;width:100%;max-width:340px;text-align:center;}
+.pinbox h2{color:#1e3a8a;margin-bottom:0.25rem;}
+.pinbox p{color:#888;font-size:0.78rem;margin-bottom:1rem;}
+.pindsp{background:#f9fafb;border:1px solid #e2e8f0;border-radius:8px;padding:0.7rem;font-size:1.4rem;letter-spacing:0.4em;color:#1e3a8a;font-weight:700;margin-bottom:0.8rem;min-height:50px;}
+.pingrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;}
+.pinkey{background:#f9fafb;border:1px solid #e2e8f0;border-radius:8px;padding:0.8rem;font-size:1.1rem;font-weight:600;cursor:pointer;}
+.pinkey:hover{background:#eff6ff;border-color:#1e3a8a;color:#1e3a8a;}
+.pinerr{color:red;font-size:0.78rem;margin-top:0.5rem;display:none;}
+#toast{position:fixed;bottom:1.2rem;left:50%;transform:translateX(-50%) translateY(80px);background:#1e3a8a;color:#fff;padding:0.55rem 1.1rem;border-radius:8px;font-size:0.82rem;z-index:9998;transition:transform 0.28s;pointer-events:none;}
+#toast.show{transform:translateX(-50%) translateY(0);}
+.empty{text-align:center;padding:2rem;color:#888;font-size:0.85rem;}
+/* ── MULTI-ADMIN & MEMBER LOGIN ── */
+.login-tabs{display:flex;gap:0;margin-bottom:1.2rem;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0;}
+.login-tab{flex:1;padding:0.5rem;font-size:0.8rem;font-weight:600;cursor:pointer;border:none;background:#f9fafb;color:#888;transition:all 0.2s;}
+.login-tab.active{background:#1e3a8a;color:#fff;}
+/* History log */
+.log-item{display:flex;align-items:center;justify-content:space-between;padding:0.55rem 0.8rem;background:#f9fafb;border:1px solid #e2e8f0;border-radius:7px;margin-bottom:0.35rem;}
+.log-who{font-weight:600;font-size:0.82rem;}
+.log-role{font-size:0.7rem;padding:0.1rem 0.4rem;border-radius:99px;font-weight:500;}
+.log-admin{background:#eff6ff;color:#1e3a8a;}
+.log-member{background:#dcfce7;color:#16a34a;}
+.log-time{font-size:0.7rem;color:#aaa;}
+
+#fin-lock{position:fixed;inset:0;background:rgba(15,23,42,0.88);z-index:500;display:none;flex-direction:column;align-items:center;justify-content:center;gap:0.7rem;}
+#fin-lock.open{display:flex;}
+#pg3{position:relative;}
+.fin-lock-box{background:#fff;border-radius:14px;padding:2rem 2rem 1.5rem;text-align:center;width:100%;max-width:320px;box-shadow:0 8px 32px rgba(0,0,0,0.18);}
+.fin-lock-box h3{color:#1e3a8a;margin-bottom:0.3rem;}
+.fin-lock-box p{color:#888;font-size:0.78rem;margin-bottom:1rem;}
+.fin-pin-dsp{background:#f9fafb;border:1px solid #e2e8f0;border-radius:8px;padding:0.6rem;font-size:1.3rem;letter-spacing:0.5em;color:#1e3a8a;font-weight:700;margin-bottom:0.8rem;min-height:46px;}
+.fin-pingrid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.4rem;margin-bottom:0.5rem;}
+.fin-pinkey{background:#f9fafb;border:1px solid #e2e8f0;border-radius:7px;padding:0.7rem;font-size:1rem;font-weight:600;cursor:pointer;}
+.fin-pinkey:hover{background:#eff6ff;border-color:#1e3a8a;color:#1e3a8a;}
+.fin-pinerr{color:red;font-size:0.75rem;margin-top:0.3rem;display:none;}
+/* Presence calendar */
+.att-cal{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:1rem;margin-bottom:1rem;}
+.att-cal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem;}
+.att-cal-title{font-size:0.95rem;font-weight:700;color:#1e3a8a;}
+.att-cal-nav{background:#eff6ff;border:1px solid #1e3a8a;color:#1e3a8a;border-radius:6px;padding:0.25rem 0.7rem;cursor:pointer;font-size:0.8rem;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.cal-day-lbl{text-align:center;font-size:0.65rem;font-weight:700;color:#888;padding:0.2rem 0;}
+.cal-day{text-align:center;font-size:0.75rem;padding:0.35rem 0.1rem;border-radius:6px;cursor:default;position:relative;}
+.cal-day.has-pres{background:#1e3a8a;color:#fff;font-weight:700;cursor:default;}
+.cal-day.today{outline:2px solid #3b82f6;}
+.cal-day.other-month{color:#d1d5db;}
+.cal-day-dot{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);width:5px;height:5px;border-radius:50%;background:#60a5fa;}
+/* Membre select for cal */
+.att-member-filter{display:flex;gap:0.7rem;margin-bottom:1rem;flex-wrap:wrap;align-items:center;}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="lbox">
+    <div id="llogo" style="margin-bottom:1rem">
+      <div style="width:65px;height:65px;border-radius:50%;border:3px solid #1e3a8a;display:inline-flex;align-items:center;justify-content:center;font-size:1.8rem;background:#eff6ff">&#10013;</div>
+    </div>
+    <h2>C.I.G.A</h2>
+    <p>Centre International des Gagneurs d&#39;Ames</p>
+    <div class="login-tabs">
+      <button class="login-tab active" id="ltab-admin" onclick="switchLoginTab('admin')">&#128274; Administrateur</button>
+      <button class="login-tab" id="ltab-member" onclick="switchLoginTab('member')">&#128100; Membre</button>
+    </div>
+    <!-- ADMIN LOGIN -->
+    <div id="login-admin-form">
+      <div class="ffield" style="margin-bottom:0.7rem;text-align:left">
+        <label class="flbl">Nom d&#39;utilisateur</label>
+        <input type="text" id="iuser" class="finp" placeholder="admin">
+      </div>
+      <div class="ffield" style="margin-bottom:1rem;text-align:left">
+        <label class="flbl">Mot de passe</label>
+        <input type="password" id="ipass" class="finp" placeholder="••••••">
+      </div>
+      <button class="btn bblu" style="width:100%;justify-content:center" id="loginbtn">Se connecter</button>
+      <div class="lerr" id="lerr">Identifiants incorrects</div>
+      <p style="font-size:0.68rem;color:#aaa;margin-top:0.8rem">Admin1: admin / ciga2024</p>
+    </div>
+    <!-- MEMBER LOGIN -->
+    <div id="login-member-form" style="display:none">
+      <div class="ffield" style="margin-bottom:0.7rem;text-align:left">
+        <label class="flbl">Votre Numero ID Membre</label>
+        <input type="text" id="mlogin-id" class="finp" placeholder="Ex: CIGA-2024-01011990">
+      </div>
+      <div class="ffield" style="margin-bottom:1rem;text-align:left">
+        <label class="flbl">Mot de passe membre</label>
+        <input type="password" id="mlogin-pass" class="finp" placeholder="••••">
+      </div>
+      <button class="btn bblu" style="width:100%;justify-content:center" id="loginbtn-member">Acceder a mon espace</button>
+      <div class="lerr" id="lerr-member">ID ou mot de passe incorrect</div>
+      <p style="font-size:0.68rem;color:#aaa;margin-top:0.8rem">Votre mot de passe est votre code PIN membre</p>
+    </div>
+  </div>
+</div>
+
+<div id="app-header" class="hide">
+  <div id="hlogo" id="hlogo2">&#10013;</div>
+  <input type="file" id="logofile" accept="image/*" style="display:none">
+  <div style="flex:1"><div id="hname">C.I.G.A</div><div style="font-size:0.6rem;opacity:0.8" id="hsub">Centre International des Gagneurs d&#39;Ames</div></div>
+  <button class="hbtn" id="btnportal">&#128100; Espace Membre</button>
+  <button class="hbtn" id="btnlogout">Deconnexion</button>
+</div>
+
+<div id="app-nav" class="hide">
+  <button class="ntab active" id="nav0">&#128202; Tableau de bord</button>
+  <button class="ntab" id="nav1">&#128101; Membres</button>
+  <button class="ntab" id="nav2">&#9989; Presences</button>
+  <button class="ntab" id="nav3">&#128176; Finances</button>
+  <button class="ntab" id="nav4">&#127963; Comites</button>
+  <button class="ntab" id="nav5">&#128197; Calendrier</button>
+  <button class="ntab" id="nav6">&#128218; Bibliotheque</button>
+  <button class="ntab" id="nav8">&#9940; Suspensions</button>
+  <button class="ntab" id="nav7">&#9881;&#65039; Config</button>
+</div>
+
+<div id="app-content" class="hide">
+
+<div id="pg0" class="page active">
+  <div class="ptitle">Tableau de bord</div>
+  <p class="psub" id="ddate"></p>
+  <div class="kgrid" id="dkpis"></div>
+  <div class="card"><div class="ctitle">Activite recente</div><div id="dfeed"></div></div>
+</div>
+
+<div id="pg1" class="page">
+  <div class="ptitle">Membres</div>
+  <p class="psub">Registre des fideles &mdash; <span id="mcnt" style="color:#1e3a8a"></span></p>
+  <div class="card">
+    <div class="ctitle">Nouveau membre</div>
+    <div class="fgrid">
+      <div class="ffield"><label class="flbl">Nom *</label><input type="text" id="mnom" class="finp" placeholder="NOM"></div>
+      <div class="ffield"><label class="flbl">Prenom *</label><input type="text" id="mprenom" class="finp" placeholder="Prenom"></div>
+      <div class="ffield"><label class="flbl">Telephone</label><input type="text" id="mtel" class="finp" placeholder="+243..."></div>
+      <div class="ffield"><label class="flbl">Date de naissance</label><input type="date" id="mnaiss" class="finp"></div>
+      <div class="ffield"><label class="flbl">Lieu de naissance</label><input type="text" id="mlieu" class="finp" placeholder="Ville"></div>
+      <div class="ffield"><label class="flbl">Adresse</label><input type="text" id="madr" class="finp" placeholder="Quartier..."></div>
+      <div class="ffield"><label class="flbl">Fonction dans l'eglise</label>
+        <select id="mfonction" class="finp">
+          <option value="">-- Selectionner une fonction --</option>
+        </select>
+      </div>
+    </div>
+    <div class="ffield" style="margin-bottom:0.7rem"><label class="flbl">Photo identite</label><input type="file" id="mphoto" class="finp" accept="image/*"></div>
+    <div class="ffield" style="margin-bottom:0.7rem"><label class="flbl">Code PIN 4 chiffres (acces espace membre)</label><input type="text" id="mpin" class="finp" placeholder="1234" maxlength="4" style="max-width:120px"></div>
+    <div class="brow"><button class="btn bblu" id="btnadd">Enregistrer le membre</button></div>
+  </div>
+  <div class="tbar">
+    <input type="text" id="msrch" class="finp" placeholder="Rechercher...">
+    <button class="btn bgrn bsm" id="btnExportExcel">&#128202; Excel</button>
+    <button class="btn bout bsm" id="btnExportPDF">&#128196; PDF</button>
+    <button class="btn bout bsm" onclick="window.print()">Imprimer</button>
+    <button class="btn bred bsm" id="btndelallmembers">&#128465; Supprimer tous</button>
+  </div>
+  <div class="mgrid" id="mgrid"></div>
+</div>
+
+<div id="pg2" class="page">
+  <div class="ptitle">Presences</div>
+  <p class="psub">Cochez les presences sur le calendrier mensuel</p>
+  <div class="card">
+    <div class="ctitle">Enregistrer une presence</div>
+    <div class="fgrid">
+      <div class="ffield"><label class="flbl">Membre</label><select id="attm" class="finp"><option value="">Selectionner</option></select></div>
+      <div class="ffield"><label class="flbl">Activite</label>
+        <select id="attact" class="finp">
+          <option>Dimanche - Culte dominical</option>
+          <option>Mardi - Culte d enseignement</option>
+          <option>Mercredi - Culte de priere</option>
+          <option>Vendredi - Intercession</option>
+          <option>Samedi - Evangelisation</option>
+        </select>
+      </div>
+      <div class="ffield"><label class="flbl">Date</label><input type="date" id="attdate" class="finp"></div>
+    </div>
+    <div class="brow"><button class="btn bgrn" id="btnattpres">&#10003; Marquer present</button></div>
+  </div>
+
+  <!-- CALENDRIER MENSUEL DES PRESENCES -->
+  <div class="att-cal">
+    <div class="att-cal-hdr">
+      <button class="att-cal-nav" id="calPrev">&#8592;</button>
+      <div class="att-cal-title" id="calMonthTitle"></div>
+      <button class="att-cal-nav" id="calNext">&#8594;</button>
+    </div>
+    <div class="att-member-filter">
+      <select id="calMember" class="finp" style="max-width:240px"><option value="">Tous les membres</option></select>
+      <select id="calAct" class="finp" style="max-width:220px">
+        <option value="">Toutes activites</option>
+        <option>Dimanche - Culte dominical</option>
+        <option>Mardi - Culte d enseignement</option>
+        <option>Mercredi - Culte de priere</option>
+        <option>Vendredi - Intercession</option>
+        <option>Samedi - Evangelisation</option>
+      </select>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div style="display:flex;gap:1rem;margin-top:0.8rem;font-size:0.72rem;color:#888;flex-wrap:wrap">
+      <span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:#1e3a8a;vertical-align:middle;margin-right:4px"></span>Presence enregistree</span>
+      <span><span style="display:inline-block;width:12px;height:12px;border-radius:3px;outline:2px solid #3b82f6;vertical-align:middle;margin-right:4px"></span>Aujourd hui</span>
+    </div>
+    <div id="calDayDetail" style="margin-top:0.8rem"></div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem;flex-wrap:wrap;gap:0.5rem">
+      <div class="ctitle" style="margin:0">Historique du mois</div>
+      <input type="text" id="attsrch" class="finp" placeholder="Filtrer..." style="width:auto;max-width:190px">
+    </div>
+    <div id="attlist"></div>
+  </div>
+</div>
+
+<div id="pg3" class="page">
+  <div class="ptitle">Finances</div>
+  <p class="psub">Dimes, offrandes et depenses</p>
+  <div class="fsum" id="fsum"></div>
+
+  <!-- ONGLETS FINANCES -->
+  <div style="display:flex;gap:0;margin-bottom:1rem;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0">
+    <button class="fin-tab active" data-ftab="0" style="flex:1;padding:0.5rem;font-size:0.78rem;font-weight:600;cursor:pointer;border:none;background:#1e3a8a;color:#fff">&#128176; Dimes</button>
+    <button class="fin-tab" data-ftab="1" style="flex:1;padding:0.5rem;font-size:0.78rem;font-weight:600;cursor:pointer;border:none;background:#f9fafb;color:#888">&#129309; Offrandes</button>
+    <button class="fin-tab" data-ftab="2" style="flex:1;padding:0.5rem;font-size:0.78rem;font-weight:600;cursor:pointer;border:none;background:#f9fafb;color:#888">&#128197; Depenses</button>
+  </div>
+
+  <!-- TAB 0 : DIMES -->
+  <div id="ftab0">
+    <div class="card" style="border-top:3px solid #16a34a">
+      <div class="ctitle" style="color:#16a34a">&#128176; Enregistrer une dime</div>
+      <div class="fgrid">
+        <div class="ffield"><label class="flbl">Membre</label><select id="fmem" class="finp"><option value="">Selectionner</option></select></div>
+        <div class="ffield"><label class="flbl">Montant (FCFA)</label><input type="number" id="famtin" class="finp" placeholder="5000"></div>
+        <div class="ffield"><label class="flbl">Date</label><input type="date" id="fdimdate" class="finp"></div>
+      </div>
+      <div class="brow"><button class="btn bgrn" id="btnaddin">&#128176; Enregistrer la dime</button></div>
+    </div>
+    <div class="card">
+      <div class="ctitle" style="color:#16a34a">Liste des dimes</div>
+      <div id="dimeList"><div class="empty">Aucune dime enregistree</div></div>
+    </div>
+  </div>
+
+  <!-- TAB 1 : OFFRANDES PAR DIMANCHE -->
+  <div id="ftab1" style="display:none">
+    <div class="card" style="border-top:3px solid #8b5cf6">
+      <div class="ctitle" style="color:#8b5cf6">&#129309; Enregistrer une offrande</div>
+      <div class="fgrid">
+        <div class="ffield"><label class="flbl">Membre (optionnel)</label><select id="offMembre" class="finp"><option value="">-- General / Collecte --</option></select></div>
+        <div class="ffield"><label class="flbl">Date</label><input type="date" id="offDate" class="finp"></div>
+        <div class="ffield"><label class="flbl">Montant (FCFA)</label><input type="number" id="offMontant" class="finp" placeholder="Ex: 5000"></div>
+      </div>
+      <div class="ffield"><label class="flbl">Note (optionnel)</label><input type="text" id="offNote" class="finp" placeholder="Ex: Culte dominical, Action de grace..."></div>
+      <div class="brow"><button class="btn" style="background:#8b5cf6;color:#fff" id="btnAddOff">+ Enregistrer offrande</button></div>
+    </div>
+    <!-- CALENDRIER OFFRANDES -->
+    <div class="card">
+      <div class="att-cal-hdr">
+        <button class="att-cal-nav" id="offCalPrev">&#8592;</button>
+        <div class="att-cal-title" id="offCalTitle"></div>
+        <button class="att-cal-nav" id="offCalNext">&#8594;</button>
+      </div>
+      <div class="cal-grid" id="offCalGrid" style="margin-top:0.8rem"></div>
+      <div id="offDayDetail" style="margin-top:0.8rem"></div>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem">
+        <div class="ctitle" style="margin:0">Historique offrandes</div>
+        <div id="offTotal" style="font-weight:700;color:#8b5cf6;font-size:0.85rem"></div>
+      </div>
+      <div id="offList"></div>
+    </div>
+  </div>
+
+  <!-- TAB 2 : DEPENSES -->
+  <div id="ftab2" style="display:none">
+    <div class="card" style="border-top:3px solid #dc2626">
+      <div class="ctitle" style="color:#dc2626">Depenses</div>
+      <div class="ffield" style="margin-bottom:0.7rem"><label class="flbl">Motif</label><input type="text" id="fmotif" class="finp" placeholder="Ex: Loyer..."></div>
+      <div class="ffield"><label class="flbl">Montant (FCFA)</label><input type="number" id="famtout" class="finp" placeholder="25000"></div>
+      <div class="brow"><button class="btn bred" id="btnaddout">Enregistrer depense</button></div>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem">
+        <div class="ctitle" style="margin:0">Transactions</div>
+        <button class="btn bout bsm" onclick="window.print()">Imprimer</button>
+      </div>
+      <div id="flist"></div>
+    </div>
+  </div>
+</div>
+
+<div id="pg4" class="page">
+  <div class="ptitle">Comites et Departements</div>
+  <p class="psub">Groupes et equipes de l eglise</p>
+  <div class="card">
+    <div class="ctitle">Creer un departement</div>
+    <div class="fgrid">
+      <div class="ffield"><label class="flbl">Nom *</label><input type="text" id="cnom" class="finp" placeholder="Ex: Chorale..."></div>
+      <div class="ffield"><label class="flbl">Responsable</label><input type="text" id="cresp" class="finp" placeholder="Nom responsable"></div>
+    </div>
+    <div class="ffield"><label class="flbl">Membres</label><input type="text" id="cmem" class="finp" placeholder="Noms separes par virgule"></div>
+    <div class="brow"><button class="btn bblu" id="btnaddcom">Creer</button></div>
+  </div>
+  <div id="comlist"></div>
+</div>
+
+<div id="pg5" class="page">
+  <div class="ptitle">Calendrier</div>
+  <p class="psub">Evenements de l eglise</p>
+  <div class="card">
+    <div class="ctitle">Ajouter un evenement</div>
+    <div class="fgrid">
+      <div class="ffield"><label class="flbl">Titre *</label><input type="text" id="evtit" class="finp" placeholder="Ex: Convention Annuelle"></div>
+      <div class="ffield"><label class="flbl">Date</label><input type="date" id="evdate" class="finp"></div>
+    </div>
+    <div class="ffield"><label class="flbl">Description</label><input type="text" id="evdesc" class="finp" placeholder="Details..."></div>
+    <div class="brow"><button class="btn bblu" id="btnaddev">Ajouter</button></div>
+  </div>
+  <div id="evlist"></div>
+</div>
+
+<div id="pg6" class="page">
+  <div class="ptitle">Bibliotheque</div>
+  <p class="psub">Livres et documents d enseignement</p>
+  <div class="card">
+    <div class="ctitle">&#128196; Televerser un document</div>
+    <div class="fgrid">
+      <div class="ffield"><label class="flbl">Titre du document *</label><input type="text" id="doctit" class="finp" placeholder="Ex: Sermon du dimanche..."></div>
+      <div class="ffield"><label class="flbl">Categorie</label>
+        <select id="doccat" class="finp">
+          <option>Sermon</option><option>Enseignement</option><option>Rapport</option><option>Formulaire</option><option>Autre</option>
+        </select>
+      </div>
+    </div>
+    <div class="ffield" style="margin-bottom:0.7rem"><label class="flbl">Fichier (PDF, Word, Image...)</label><input type="file" id="docfile" class="finp" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.ppt,.pptx,.xls,.xlsx"></div>
+    <div class="brow"><button class="btn bblu" id="btnadddoc">&#128190; Enregistrer le document</button></div>
+  </div>
+  <div class="card" id="doclistcard">
+    <div class="ctitle">&#128193; Documents telecharges</div>
+    <div id="doclist"><div class="empty">Aucun document televerse</div></div>
+  </div>
+  <div class="card">
+    <div class="ctitle">Ajouter un livre</div>
+    <div class="fgrid">
+      <div class="ffield"><label class="flbl">Titre *</label><input type="text" id="btit" class="finp" placeholder="Titre du livre"></div>
+      <div class="ffield"><label class="flbl">Auteur</label><input type="text" id="baut" class="finp" placeholder="Auteur"></div>
+      <div class="ffield"><label class="flbl">Categorie</label>
+        <select id="bcat" class="finp">
+          <option>Enseignement biblique</option><option>Priere et intercession</option>
+          <option>Evangelisation</option><option>Vie chretienne</option>
+          <option>Leadership</option><option>Prophetie</option><option>Autre</option>
+        </select>
+      </div>
+      <div class="ffield"><label class="flbl">Disponibilite</label>
+        <select id="bavail" class="finp">
+          <option>Disponible</option><option>Emprunte</option><option>En commande</option><option>Archive</option>
+        </select>
+      </div>
+      <div class="ffield"><label class="flbl">Annee</label><input type="text" id="byr" class="finp" placeholder="2020"></div>
+      <div class="ffield"><label class="flbl">Exemplaires</label><input type="number" id="bqty" class="finp" placeholder="1"></div>
+    </div>
+    <div class="ffield" style="margin-bottom:0.7rem"><label class="flbl">Description</label><textarea id="bdesc" class="finp" placeholder="Resume..."></textarea></div>
+    <div class="ffield"><label class="flbl">Couverture</label><input type="file" id="bcover" class="finp" accept="image/*"></div>
+    <div class="brow"><button class="btn bblu" id="btnaddbook">Enregistrer le livre</button></div>
+  </div>
+  <div class="tbar">
+    <input type="text" id="bsrch" class="finp" placeholder="Rechercher un livre...">
+    <select id="bfcat" class="finp" style="width:auto;max-width:180px">
+      <option value="">Toutes categories</option>
+      <option>Enseignement biblique</option><option>Priere et intercession</option>
+      <option>Evangelisation</option><option>Vie chretienne</option>
+      <option>Leadership</option><option>Prophetie</option><option>Autre</option>
+    </select>
+  </div>
+  <div id="libstats" style="margin-bottom:1rem"></div>
+  <div id="booklist"></div>
+  </div>
+</div>
+
+<div id="pg7" class="page">
+  <div class="ptitle">Configuration</div>
+  <p class="psub">Parametres generaux de l eglise</p>
+  <div class="card">
+    <div class="ctitle">Informations de l eglise</div>
+    <div class="fgrid">
+      <div class="ffield"><label class="flbl">Nom officiel</label><input type="text" id="cfgname" class="finp" placeholder="C.I.G.A"></div>
+      <div class="ffield"><label class="flbl">Sous-titre</label><input type="text" id="cfgsub" class="finp" placeholder="Centre International..."></div>
+      <div class="ffield"><label class="flbl">Telephone</label><input type="text" id="cfgtel" class="finp" placeholder="+243..."></div>
+    </div>
+    <div class="ffield"><label class="flbl">Logo</label><input type="file" id="cfglogo" class="finp" accept="image/*"></div>
+    <div id="cfglogoprev" style="margin-top:0.6rem"></div>
+    <div class="brow"><button class="btn bblu" id="btnsavecfg">Enregistrer la configuration</button></div>
+  </div>
+  <div class="card">
+    <div class="ctitle">&#128202; Configuration du Tableau de bord</div>
+    <p style="font-size:0.78rem;color:#888;margin-bottom:1rem">Choisissez les informations a afficher sur le tableau de bord</p>
+    <div class="fgrid">
+      <div class="ffield" style="flex-direction:row;align-items:center;gap:0.5rem"><input type="checkbox" id="dashMembres" style="width:18px;height:18px;cursor:pointer"><label style="font-size:0.85rem;cursor:pointer" for="dashMembres">Membres</label></div>
+      <div class="ffield" style="flex-direction:row;align-items:center;gap:0.5rem"><input type="checkbox" id="dashPresence" style="width:18px;height:18px;cursor:pointer"><label style="font-size:0.85rem;cursor:pointer" for="dashPresence">Presence du mois</label></div>
+      <div class="ffield" style="flex-direction:row;align-items:center;gap:0.5rem"><input type="checkbox" id="dashDept" style="width:18px;height:18px;cursor:pointer"><label style="font-size:0.85rem;cursor:pointer" for="dashDept">Departements</label></div>
+      <div class="ffield" style="flex-direction:row;align-items:center;gap:0.5rem"><input type="checkbox" id="dashLivres" style="width:18px;height:18px;cursor:pointer"><label style="font-size:0.85rem;cursor:pointer" for="dashLivres">Livres</label></div>
+      <div class="ffield" style="flex-direction:row;align-items:center;gap:0.5rem"><input type="checkbox" id="dashActivites" style="width:18px;height:18px;cursor:pointer"><label style="font-size:0.85rem;cursor:pointer" for="dashActivites">Activites en cours</label></div>
+      <div class="ffield" style="flex-direction:row;align-items:center;gap:0.5rem"><input type="checkbox" id="dashFinances" style="width:18px;height:18px;cursor:pointer"><label style="font-size:0.85rem;cursor:pointer" for="dashFinances">Finances</label></div>
+    </div>
+    <div class="ffield" style="margin-top:0.5rem;margin-bottom:0.7rem">
+      <label class="flbl">Autres informations (texte libre a afficher sur le tableau de bord)</label>
+      <input type="text" id="dashAutres" class="finp" placeholder="Ex: Prochaine convention le 15 Juillet...">
+    </div>
+    <div class="brow"><button class="btn bblu" id="btnsavedash">Enregistrer la configuration du tableau de bord</button></div>
+  </div>
+  <div class="card">
+    <div class="ctitle">Changer le mot de passe</div>
+    <div class="fgrid">
+      <div class="ffield"><label class="flbl">Nouveau mot de passe</label><input type="password" id="np1" class="finp"></div>
+      <div class="ffield"><label class="flbl">Confirmer</label><input type="password" id="np2" class="finp"></div>
+    </div>
+    <div class="brow"><button class="btn bout" id="btnchgpass">Changer</button></div>
+  </div>
+  <div class="card">
+    <div class="ctitle">&#128101; Gestion des Administrateurs</div>
+    <p style="font-size:0.78rem;color:#888;margin-bottom:1rem">3 administrateurs maximum. Chacun a son propre nom et mot de passe.</p>
+    <div id="adminList"></div>
+    <div style="border-top:1px solid #e2e8f0;margin-top:0.8rem;padding-top:0.8rem">
+      <div class="fgrid">
+        <div class="ffield"><label class="flbl">Nom d'utilisateur</label><input type="text" id="newAdminUser" class="finp" placeholder="Ex: pasteur"></div>
+        <div class="ffield"><label class="flbl">Mot de passe</label><input type="password" id="newAdminPass" class="finp" placeholder="••••••"></div>
+        <div class="ffield"><label class="flbl">Role</label>
+          <select id="newAdminRole" class="finp">
+            <option value="Admin Principal">Admin Principal</option>
+            <option value="Secretaire">Secretaire</option>
+            <option value="Tresorier">Tresorier</option>
+          </select>
+        </div>
+      </div>
+      <div class="brow"><button class="btn bgrn" id="btnAddAdmin">+ Ajouter administrateur</button></div>
+    </div>
+  </div>
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem">
+      <div class="ctitle" style="margin:0">&#128203; Historique des connexions</div>
+      <button class="btn bred bsm" id="btnClearHistory">&#128465; Supprimer historique</button>
+    </div>
+    <p style="font-size:0.78rem;color:#888;margin-bottom:0.8rem">Qui a visite l'application et quand</p>
+    <div id="loginHistoryList"><div class="empty">Aucune connexion enregistree</div></div>
+  </div>
+  <div class="card">
+    <div class="ctitle">&#9940; Membres suspendus</div>
+    <p style="font-size:0.78rem;color:#888;margin-bottom:0.8rem">Liste des membres dont l'acces est suspendu</p>
+    <div id="suspendedList"><div class="empty">Aucun membre suspendu</div></div>
+  </div>
+  <div class="card">
+    <div class="ctitle">&#128101; Fonctions dans l'eglise</div>
+    <p style="font-size:0.78rem;color:#888;margin-bottom:1rem">Personnalisez la liste des fonctions disponibles lors de l'enregistrement des membres</p>
+    <div style="display:flex;gap:0.5rem;margin-bottom:0.8rem">
+      <input type="text" id="newFonction" class="finp" placeholder="Ex: Intercesseur, Louangeur...">
+      <button class="btn bgrn bsm" id="btnAddFonction" style="white-space:nowrap">+ Ajouter</button>
+    </div>
+    <div id="fonctionsList" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:0.5rem"></div>
+  </div>
+  <div class="card">
+    <div class="ctitle">&#128274; Code PIN Finance</div>
+    <p style="font-size:0.78rem;color:#888;margin-bottom:1rem">Definissez le code PIN a 4 chiffres pour acceder a la rubrique Finances (par defaut : 1234)</p>
+    <div class="fgrid">
+      <div class="ffield"><label class="flbl">Nouveau PIN Finance</label><input type="password" id="fp1" class="finp" maxlength="4" placeholder="1234"></div>
+      <div class="ffield"><label class="flbl">Confirmer</label><input type="password" id="fp2" class="finp" maxlength="4" placeholder="1234"></div>
+    </div>
+    <div class="brow"><button class="btn bout" id="btnChgFinPin">Enregistrer le PIN</button></div>
+  </div>
+  <div class="card">
+    <div class="ctitle">&#128197; Activites regulieres de l eglise</div>
+    <p style="font-size:0.78rem;color:#888;margin-bottom:1rem">Personnalisez le programme visible dans l espace membre</p>
+    <div style="display:flex;gap:0.5rem;margin-bottom:0.5rem">
+      <input type="text" id="newActJour" class="finp" placeholder="Jour (Ex: Dimanche)" style="max-width:130px">
+      <input type="text" id="newActHeure" class="finp" placeholder="Heure (Ex: 9h00)" style="max-width:100px">
+      <input type="text" id="newActNom" class="finp" placeholder="Activite (Ex: Culte dominical)">
+    </div>
+    <div class="brow"><button class="btn bgrn" id="btnAddActivite">+ Ajouter activite</button></div>
+    <div id="activitesList" style="margin-top:0.8rem"></div>
+  </div>
+
+</div>
+
+<div id="pg8" class="page">
+  <div class="ptitle">&#9940; Suspensions</div>
+  <p class="psub">Gestion des membres suspendus</p>
+  <div class="card">
+    <div class="ctitle">Suspendre un membre</div>
+    <p style="font-size:0.78rem;color:#888;margin-bottom:1rem">Selectionnez un membre et entrez la raison de la suspension</p>
+    <div class="fgrid">
+      <div class="ffield"><label class="flbl">Membre</label>
+        <select id="suspMember" class="finp"><option value="">-- Selectionner un membre --</option></select>
+      </div>
+      <div class="ffield"><label class="flbl">Raison</label>
+        <select id="suspRaison" class="finp">
+          <option>Indiscipline</option>
+          <option>Absence prolongee</option>
+          <option>Non-respect des regles</option>
+          <option>Probleme financier</option>
+          <option>Demande personnelle</option>
+          <option>Autre</option>
+        </select>
+      </div>
+    </div>
+    <div class="ffield"><label class="flbl">Commentaire (optionnel)</label>
+      <input type="text" id="suspComment" class="finp" placeholder="Details supplementaires...">
+    </div>
+    <div class="brow"><button class="btn" style="background:#f59e0b;color:#fff" id="btnSuspendMember">&#9940; Suspendre ce membre</button></div>
+  </div>
+  <div class="card">
+    <div class="ctitle">&#9940; Membres suspendus</div>
+    <div id="suspListPage"><div class="empty">Aucun membre suspendu</div></div>
+  </div>
+  <div class="card">
+    <div class="ctitle">&#9989; Membres actifs</div>
+    <div id="activeMembersList"><div class="empty">Aucun membre enregistre</div></div>
+  </div>
+</div>
+
+<div id="mportal">
+  <div class="phdr">
+    <div class="plogo" id="plogo">&#10013;</div>
+    <div style="flex:1"><div style="font-size:0.92rem;font-weight:700" id="pchname">C.I.G.A</div><div style="font-size:0.6rem;opacity:0.8">Espace Membre</div></div>
+    <button class="hbtn" id="btncloseportal">Fermer</button>
+  </div>
+  <div class="ptabs">
+    <button class="ptab active" id="ptab0">Ma Fiche</button>
+    <button class="ptab" id="ptab1">Presences</button>
+    <button class="ptab" id="ptab2">Dime</button>
+    <button class="ptab" id="ptab3">Bibliotheque</button>
+    <button class="ptab" id="ptab4">Calendrier</button>
+  </div>
+  <div class="pbody">
+    <div id="pp0" class="ppage active">
+      <div class="card" style="padding:0;overflow:hidden">
+        <div class="pbanner"></div>
+        <div style="padding:0 1.2rem 1.2rem">
+          <div id="pavwrap"></div>
+          <div style="font-size:1.2rem;font-weight:700;margin-top:0.5rem" id="pmname"></div>
+          <div id="pmid" style="font-family:monospace;font-size:0.75rem;color:#1e3a8a;background:#eff6ff;padding:0.12rem 0.4rem;border-radius:3px;display:inline-block;margin-top:0.2rem"></div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.7rem;margin-top:1rem" id="pminfo"></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0.8rem;margin-top:1rem" id="pmstats"></div>
+    </div>
+    <div id="pp1" class="ppage">
+      <div style="font-size:1rem;font-weight:700;color:#1e3a8a;margin-bottom:1rem">Mes presences</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0.7rem;margin-bottom:1rem" id="pprstats"></div>
+      <div id="ppreslist"></div>
+    </div>
+    <div id="pp2" class="ppage">
+      <div style="font-size:1rem;font-weight:700;color:#1e3a8a;margin-bottom:1rem">&#128176; Statut de ma Dime</div>
+      <div id="pdimeStatus"></div>
+    </div>
+    <div id="pp3" class="ppage">
+      <div style="font-size:1rem;font-weight:700;color:#1e3a8a;margin-bottom:1rem">&#128218; Bibliotheque</div>
+      <div style="display:flex;margin-bottom:1rem;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0">
+        <button id="plibtab-livres" onclick="switchLibTab('livres')" style="flex:1;padding:0.5rem;font-size:0.8rem;font-weight:600;cursor:pointer;border:none;background:#1e3a8a;color:#fff">&#128213; Livres</button>
+        <button id="plibtab-docs" onclick="switchLibTab('docs')" style="flex:1;padding:0.5rem;font-size:0.8rem;font-weight:600;cursor:pointer;border:none;background:#f9fafb;color:#888">&#128196; Documents</button>
+      </div>
+      <div id="plib-livres">
+        <input type="text" id="pbsrch" class="finp" placeholder="Rechercher un livre..." style="margin-bottom:1rem">
+        <div id="pbooklist"></div>
+      </div>
+      <div id="plib-docs" style="display:none">
+        <div id="pdoclist"></div>
+      </div>
+    </div>
+    <div id="pp4" class="ppage">
+      <div style="font-size:1rem;font-weight:700;color:#1e3a8a;margin-bottom:1rem">&#128197; Calendrier des activites</div>
+      <div id="pevlist"></div>
+      <div style="margin-top:1.5rem">
+        <div style="font-size:0.9rem;font-weight:600;color:#1e3a8a;margin-bottom:0.8rem">Programme hebdomadaire</div>
+        <div id="pActivitesList"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="pinscr">
+  <div class="pinbox">
+    <div id="pinlogo" style="margin-bottom:0.8rem">
+      <div style="width:60px;height:60px;border-radius:50%;border:3px solid #1e3a8a;display:inline-flex;align-items:center;justify-content:center;font-size:1.5rem;background:#eff6ff">&#10013;</div>
+    </div>
+    <h2>Espace Membre</h2>
+    <p>Entrez votre code PIN 4 chiffres</p>
+    <div class="pindsp" id="pindsp">_ _ _ _</div>
+    <div class="pingrid">
+      <button class="pinkey" id="pk1">1</button>
+      <button class="pinkey" id="pk2">2</button>
+      <button class="pinkey" id="pk3">3</button>
+      <button class="pinkey" id="pk4">4</button>
+      <button class="pinkey" id="pk5">5</button>
+      <button class="pinkey" id="pk6">6</button>
+      <button class="pinkey" id="pk7">7</button>
+      <button class="pinkey" id="pk8">8</button>
+      <button class="pinkey" id="pk9">9</button>
+      <button class="pinkey" id="pkcl" style="color:#dc2626;font-size:0.9rem">Effacer</button>
+      <button class="pinkey" id="pk0">0</button>
+      <button class="pinkey" id="pkdel" style="color:#888;font-size:0.9rem">&#9003;</button>
+    </div>
+    <div class="pinerr" id="pinerr">Code PIN incorrect</div>
+    <button class="btn bout" id="btnclosepinscr" style="width:100%;justify-content:center;margin-top:0.8rem">Annuler</button>
+  </div>
+</div>
+
+<div class="mbk" id="qrmodal">
+  <div class="mbx" style="max-width:380px">
+    <div class="mbtitle" id="qrtitle">QR Code</div>
+    <div class="qrwrap">
+      <div class="qriw" id="qrimg"></div>
+      <div class="qrtxt" id="qrtxt"></div>
+    </div>
+    <div class="mbact"><button class="btn bout" id="btncloseqr">Fermer</button></div>
+  </div>
+</div>
+
+<div class="cbk" id="cfmdlg">
+  <div class="cbx">
+    <div class="cico" id="cico">&#9888;&#65039;</div>
+    <div class="ctit" id="ctit">Confirmer</div>
+    <div class="cmsg" id="cmsg">Etes-vous sur?</div>
+    <div class="cbtns">
+      <button class="btn bout" id="btncancelcfm">Annuler</button>
+      <button class="btn bred" id="btnokcfm">Confirmer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALE MODIFIER MEMBRE -->
+<div id="editmodal" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,0.7);z-index:400;align-items:center;justify-content:center;padding:1rem">
+  <div style="background:#fff;border-radius:14px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;padding:1.5rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem">
+      <div style="font-size:1rem;font-weight:700;color:#1e3a8a">&#9998; Modifier le membre</div>
+      <button onclick="document.getElementById('editmodal').style.display='none'" style="background:none;border:none;font-size:1.3rem;cursor:pointer;color:#888">&#x2715;</button>
+    </div>
+    <div class="fgrid">
+      <div class="ffield"><label class="flbl">Nom</label><input type="text" id="enom" class="finp"></div>
+      <div class="ffield"><label class="flbl">Prenom</label><input type="text" id="eprenom" class="finp"></div>
+      <div class="ffield"><label class="flbl">Telephone</label><input type="text" id="etel" class="finp"></div>
+      <div class="ffield"><label class="flbl">Date de naissance</label><input type="date" id="enaiss" class="finp"></div>
+      <div class="ffield"><label class="flbl">Lieu de naissance</label><input type="text" id="elieu" class="finp"></div>
+      <div class="ffield"><label class="flbl">Adresse</label><input type="text" id="eadr" class="finp"></div>
+      <div class="ffield"><label class="flbl">Fonction</label><select id="efonction" class="finp"></select></div>
+      <div class="ffield"><label class="flbl">Code PIN</label><input type="password" id="epin" class="finp" maxlength="6"></div>
+    </div>
+    <div class="ffield" style="margin-bottom:1rem"><label class="flbl">Nouvelle photo (optionnel)</label><input type="file" id="ephoto" class="finp" accept="image/*"></div>
+    <div id="ephoto-prev" style="margin-bottom:0.8rem"></div>
+    <div class="brow">
+      <button class="btn bgrn" id="btnSaveEdit">&#10003; Enregistrer les modifications</button>
+      <button class="btn bout" onclick="document.getElementById('editmodal').style.display='none'">Annuler</button>
+    </div>
+  </div>
+</div>
+
+<div id="fin-lock">
+  <div class="fin-lock-box">
+    <div style="font-size:2rem;margin-bottom:0.5rem">&#128274;</div>
+    <h3>Finances</h3>
+    <p>Entrez le code PIN Finance pour acceder</p>
+    <div class="fin-pin-dsp" id="fin-pin-dsp">_ _ _ _</div>
+    <div class="fin-pingrid">
+      <button class="fin-pinkey" data-fk="1">1</button><button class="fin-pinkey" data-fk="2">2</button><button class="fin-pinkey" data-fk="3">3</button>
+      <button class="fin-pinkey" data-fk="4">4</button><button class="fin-pinkey" data-fk="5">5</button><button class="fin-pinkey" data-fk="6">6</button>
+      <button class="fin-pinkey" data-fk="7">7</button><button class="fin-pinkey" data-fk="8">8</button><button class="fin-pinkey" data-fk="9">9</button>
+      <button class="fin-pinkey" data-fk="clr" style="color:#dc2626;font-size:0.85rem">Effacer</button>
+      <button class="fin-pinkey" data-fk="0">0</button>
+      <button class="fin-pinkey" data-fk="del" style="color:#888">&#9003;</button>
+    </div>
+    <div class="fin-pinerr" id="fin-pinerr">Code PIN incorrect. Par defaut : 1234</div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+var MOIS = ['Janvier','Fevrier','Mars','Avril','Mai','Juin','Juillet','Aout','Septembre','Octobre','Novembre','Decembre'];
+var db = {
+  members    : [],
+  attendance : [],
+  finances   : [],
+  committees : [],
+  events     : [],
+  books      : [],
+  docs       : [],
+  logo       : ''
+};
+var cfg = {
+  name:'C.I.G.A', sub:'Centre International des Gagneurs d Ames', tel:'', pass:'ciga2024',
+  dash:{ membres:true, presenceMois:true, departement:true, livres:true, activites:true, finances:true, autres:'' }
+};
+var pinVal = '';
+var curMember = null;
+var cfmCB = null;
+
+function loadDB() {
+  try { db.members    = JSON.parse(localStorage.getItem('ciga_m')   || '[]'); } catch(e) { db.members = []; }
+  try { db.attendance = JSON.parse(localStorage.getItem('ciga_a')   || '[]'); } catch(e) { db.attendance = []; }
+  try { db.finances   = JSON.parse(localStorage.getItem('ciga_f')   || '[]'); } catch(e) { db.finances = []; }
+  try { db.committees = JSON.parse(localStorage.getItem('ciga_c')   || '[]'); } catch(e) { db.committees = []; }
+  try { db.events     = JSON.parse(localStorage.getItem('ciga_e')   || '[]'); } catch(e) { db.events = []; }
+  try { db.books      = JSON.parse(localStorage.getItem('ciga_bk')  || '[]'); } catch(e) { db.books = []; }
+  try { db.docs = JSON.parse(localStorage.getItem('ciga_docs') || '[]'); } catch(e) { db.docs = []; }
+  try { db.offrandes = JSON.parse(localStorage.getItem('ciga_off') || '[]'); } catch(e) { db.offrandes = []; }
+  try { var sc = localStorage.getItem('ciga_cfg'); if(sc) { var p = JSON.parse(sc); if(p.name) cfg.name=p.name; if(p.sub) cfg.sub=p.sub; if(p.tel) cfg.tel=p.tel; if(p.pass) cfg.pass=p.pass; if(p.dash) cfg.dash=Object.assign({membres:true,presenceMois:true,departement:true,livres:true,activites:true,finances:true,autres:''},p.dash); } } catch(e) {}
+  db.logo = localStorage.getItem('ciga_logo') || '';
+  syncFromFirebase();
+}
+
+function syncFromFirebase() {
+  try{
+  var keys = ['members','attendance','finances','committees','events','books','docs'];
+  var lsKeys = ['ciga_m','ciga_a','ciga_f','ciga_c','ciga_e','ciga_bk','ciga_docs'];
+  keys.forEach(function(key, i) {
+    try{rtdb.ref(key).on('value', function(snap) {
+      var val = snap.val();
+      if(val) {
+        if(Array.isArray(val)) { db[key] = val; }
+        else { db[key] = Object.values(val); }
+      } else { db[key] = []; }
+      try{localStorage.setItem(lsKeys[i],JSON.stringify(db[key]));}catch(e){}
+      // Refresh portal if member is logged in
+      if(curMember){
+        var updated=null;
+        for(var j=0;j<db.members.length;j++) if(Number(db.members[j].uid)===Number(curMember.uid)){updated=db.members[j];break;}
+        if(updated){
+          curMember=updated;
+          try{
+            loadPortal(updated);
+            setTimeout(function(){
+              loadPortalDime(updated);
+              loadPortalPres(updated);
+              loadPortalFin(updated);
+              loadPortalBooks();
+              loadPortalCal();
+            },200);
+          }catch(e){}
+        }
+      }
+      try{if(currentPage>=0)goPage(currentPage);}catch(e){}
+    });}catch(ee){}
+  });
+  try{rtdb.ref('config').on('value', function(snap) {
+    var val = snap.val();
+    if(val) {
+      if(val.name) cfg.name = val.name;
+      if(val.sub) cfg.sub = val.sub;
+      if(val.tel) cfg.tel = val.tel;
+      if(val.pass) cfg.pass = val.pass;
+      if(val.dash) cfg.dash = Object.assign({}, cfg.dash, val.dash);
+      applyConfig();
+    }
+  });}catch(ee){}
+  }catch(eee){console.warn('Firebase unavailable');}
+}
+
+var currentPage = 0;
+function saveDB() {
+  try {
+    localStorage.setItem('ciga_m',   JSON.stringify(db.members));
+    localStorage.setItem('ciga_a',   JSON.stringify(db.attendance));
+    localStorage.setItem('ciga_f',   JSON.stringify(db.finances));
+    localStorage.setItem('ciga_c',   JSON.stringify(db.committees));
+    localStorage.setItem('ciga_e',   JSON.stringify(db.events));
+    localStorage.setItem('ciga_bk',  JSON.stringify(db.books));
+    localStorage.setItem('ciga_docs', JSON.stringify(db.docs));
+    localStorage.setItem('ciga_off', JSON.stringify(db.offrandes||[]));
+    localStorage.setItem('ciga_cfg', JSON.stringify(cfg));
+    if(db.logo) localStorage.setItem('ciga_logo', db.logo);
+  } catch(e) {}
+  saveToFirebase();
+}
+
+function saveToFirebase() {
+  try{
+  var keys = ['members','attendance','finances','committees','events','books','docs'];
+  keys.forEach(function(key) {
+    try{rtdb.ref(key).set(db[key]);}catch(e){}
+  });
+  try{rtdb.ref('config').set(cfg);}catch(e){}
+  }catch(e){}
+}
+
+function toast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2500);
+}
+
+function openCfm(ico, tit, msg, cb) {
+  document.getElementById('cico').textContent = ico;
+  document.getElementById('ctit').textContent = tit;
+  document.getElementById('cmsg').textContent = msg;
+  cfmCB = cb;
+  document.getElementById('cfmdlg').classList.add('open');
+}
+function closeCfm() { document.getElementById('cfmdlg').classList.remove('open'); cfmCB = null; }
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function applyConfig() {
+  document.getElementById('hname').textContent = cfg.name;
+  document.getElementById('hsub').textContent  = cfg.sub;
+  if(db.logo) {
+    document.getElementById('hlogo').innerHTML  = '<img src="' + db.logo + '">';
+    document.getElementById('llogo').innerHTML  = '<img src="' + db.logo + '" style="width:65px;height:65px;border-radius:50%;border:3px solid #1e3a8a;object-fit:cover">';
+    document.getElementById('plogo').innerHTML  = '<img src="' + db.logo + '">';
+    document.getElementById('pinlogo').innerHTML = '<img src="' + db.logo + '" style="width:60px;height:60px;border-radius:50%;border:3px solid #1e3a8a;object-fit:cover">';
+  }
+  document.getElementById('pchname').textContent = cfg.name;
+}
+
+function genId(naiss) {
+  // Format : CIGA-2026-DDMMAAAA
+  // Si date de naissance fournie, on l'utilise
+  var datePart = '';
+  if(naiss && naiss.length === 10) {
+    // naiss format AAAA-MM-JJ → on transforme en JJMMAAAA
+    var parts = naiss.split('-');
+    if(parts.length === 3) {
+      datePart = parts[2] + parts[1] + parts[0]; // JJMMAAAA
+    }
+  }
+  if(!datePart) {
+    // Pas de date de naissance : on utilise la date du jour
+    var now = new Date();
+    var jj = String(now.getDate()).padStart(2,'0');
+    var mm = String(now.getMonth()+1).padStart(2,'0');
+    var aa = now.getFullYear();
+    datePart = jj + mm + aa;
+  }
+  var base = 'CIGA-2026-' + datePart;
+  // Si un membre a déjà le même ID, on ajoute un suffixe
+  var exists = false;
+  for(var i=0;i<db.members.length;i++) if(db.members[i].id === base) { exists = true; break; }
+  if(!exists) return base;
+  // Suffixe numérique si doublon
+  for(var n=2; n<100; n++) {
+    var candidate = base + '-' + n;
+    var dup = false;
+    for(var i=0;i<db.members.length;i++) if(db.members[i].id === candidate) { dup = true; break; }
+    if(!dup) return candidate;
+  }
+  return base + '-' + Date.now();
+}
+
+// ── NAVIGATION ──
+function goPage(idx) {
+  currentPage=idx;
+  for(var i=0;i<9;i++) {
+    var pg = document.getElementById('pg'+i);
+    var nb = document.getElementById('nav'+i);
+    if(pg) pg.classList.remove('active');
+    if(nb) nb.classList.remove('active');
+  }
+  var p = document.getElementById('pg'+idx);
+  var n = document.getElementById('nav'+idx);
+  if(p) p.classList.add('active');
+  if(n) n.classList.add('active');
+  // Verrou Finance
+  var fl=document.getElementById('fin-lock');
+  if(fl){if(idx===3){fl.classList.add('open');finPinVal='';updFinPin();document.getElementById('fin-pinerr').style.display='none';}else{fl.classList.remove('open');}}
+  if(idx===0) renderDash();
+  if(idx===1) renderMembers();
+  if(idx===2) { fillSelects(); renderAtt(); }
+  if(idx===3) { fillSelects(); renderFin(); renderDimeList(); }
+  if(idx===4) renderCom();
+  if(idx===5) renderEv();
+  if(idx===6) renderBooks();
+  if(idx===7) renderCfg();
+  if(idx===8) renderSuspension();
+}
+
+// ── DASHBOARD ──
+function renderDash() {
+  var now = new Date();
+  var days = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  document.getElementById('ddate').textContent = days[now.getDay()] + ' ' + now.getDate() + ' ' + MOIS[now.getMonth()] + ' ' + now.getFullYear();
+  var ym = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+  var mp = 0;
+  for(var i=0;i<db.attendance.length;i++) if((db.attendance[i].date||'').indexOf(ym)===0) mp++;
+  var ti=0, to=0;
+  for(var i=0;i<db.finances.length;i++) { if(db.finances[i].type==='in') ti+=db.finances[i].amount; else to+=db.finances[i].amount; }
+  var evFutures=0; var today2=new Date().toISOString().split('T')[0];
+  for(var i=0;i<db.events.length;i++) if(!db.events[i].date||db.events[i].date>=today2) evFutures++;
+  var d = cfg.dash || {};
+  var kpis = '';
+  if(d.membres!==false)    kpis += '<div class="kbox"><div class="knum">'+db.members.length+'</div><div class="klbl">&#128101; Membres</div></div>';
+  if(d.presenceMois!==false) kpis += '<div class="kbox"><div class="knum">'+mp+'</div><div class="klbl">&#9989; Presences ce mois</div></div>';
+  if(d.finances!==false)   kpis += '<div class="kbox"><div class="knum">'+ti.toLocaleString()+'</div><div class="klbl">&#128176; Entrees FCFA</div></div>'
+    +'<div class="kbox"><div class="knum" style="color:'+(ti-to>=0?'#1e3a8a':'#dc2626')+'">'+(ti-to).toLocaleString()+'</div><div class="klbl">&#128200; Solde FCFA</div></div>';
+  if(d.departement!==false) kpis += '<div class="kbox"><div class="knum">'+db.committees.length+'</div><div class="klbl">&#127963; Departements</div></div>';
+  if(d.livres!==false)     kpis += '<div class="kbox"><div class="knum">'+db.books.length+'</div><div class="klbl">&#128218; Livres</div></div>';
+  if(d.activites!==false)  kpis += '<div class="kbox"><div class="knum">'+evFutures+'</div><div class="klbl">&#128197; Activites a venir</div></div>';
+  if(d.autres)             kpis += '<div class="kbox" style="grid-column:1/-1"><div class="knum" style="font-size:0.9rem;line-height:1.5;color:#374151">&#128221; '+d.autres+'</div><div class="klbl">Informations</div></div>';
+  if(!kpis) kpis = '<div class="empty" style="grid-column:1/-1">Configurez le tableau de bord dans Parametres &#9881;&#65039;</div>';
+  document.getElementById('dkpis').innerHTML = kpis;
+  var rec = db.attendance.slice().reverse().slice(0,6);
+  var h = '';
+  for(var i=0;i<rec.length;i++) h += '<div class="litem"><div><div class="ltitle">'+rec[i].mname+'</div><div class="lsub">'+rec[i].act+'</div></div><span style="font-size:0.73rem;color:#888">'+rec[i].date+'</span></div>';
+  document.getElementById('dfeed').innerHTML = h || '<div class="empty">Aucune activite recente</div>';
+}
+
+// ── MEMBRES ──
+function getAv(m, sz) {
+  if(m.photo) return '<img src="'+m.photo+'" style="width:'+sz+'px;height:'+sz+'px;border-radius:8px;object-fit:cover">';
+  return '<div class="mav" style="width:'+sz+'px;height:'+sz+'px;font-size:'+Math.floor(sz*0.28)+'px">'+m.nom[0]+m.prenom[0]+'</div>';
+}
+
+function addMember() {
+  var nom = document.getElementById('mnom').value.trim();
+  var prenom = document.getElementById('mprenom').value.trim();
+  if(!nom||!prenom) { toast('Nom et prenom requis'); return; }
+  var pf = document.getElementById('mphoto').files[0];
+  function doSave(photo) {
+    var naiss = document.getElementById('mnaiss').value;
+    db.members.push({ id:genId(naiss), uid:Date.now(), nom:nom, prenom:prenom,
+      tel:document.getElementById('mtel').value.trim(),
+      naiss:document.getElementById('mnaiss').value,
+      lieu:document.getElementById('mlieu').value.trim(),
+      adr:document.getElementById('madr').value.trim(),
+      fonction:document.getElementById('mfonction').value.trim(),
+      pin:document.getElementById('mpin').value.trim(),
+      photo:photo||'' });
+    saveDB();
+    document.getElementById('mnom').value=''; document.getElementById('mprenom').value='';
+    document.getElementById('mtel').value=''; document.getElementById('mnaiss').value='';
+    document.getElementById('mlieu').value=''; document.getElementById('madr').value='';
+    document.getElementById('mpin').value=''; document.getElementById('mphoto').value='';
+    document.getElementById('mfonction').value='';
+    renderMembers(); fillSelects();
+    toast('Membre enregistre');
+  }
+  if(pf) { var r=new FileReader(); r.onload=function(e){doSave(e.target.result);}; r.readAsDataURL(pf); }
+  else doSave('');
+}
+
+function delMember(uid) {
+  var m=null; for(var i=0;i<db.members.length;i++) if(db.members[i].uid===uid){m=db.members[i];break;}
+  if(!m) return;
+  openCfm('&#128465;','Supprimer','Supprimer '+m.prenom+' '+m.nom+' ? Action irreversible.',function(){
+    db.members    = db.members.filter(function(x){return x.uid!==uid;});
+    db.attendance = db.attendance.filter(function(a){return a.muid!==uid;});
+    db.finances   = db.finances.filter(function(f){return f.muid!==uid;});
+    saveDB(); renderMembers(); fillSelects(); toast('Supprime');
+  });
+}
+
+function delAllMembers() {
+  if(!db.members.length) { toast('Aucun membre a supprimer'); return; }
+  openCfm('&#9888;&#65039;', 'Supprimer TOUS les membres',
+    'Cette action supprimera les ' + db.members.length + ' membre(s) et toutes leurs donnees associees (presences, finances). Action IRREVERSIBLE !',
+    function() {
+      db.members = []; db.attendance = []; db.finances = [];
+      saveDB(); renderMembers(); fillSelects();
+      toast('Tous les membres ont ete supprimes');
+    }
+  );
+}
+
+function renderMembers() {
+  var q = (document.getElementById('msrch').value||'').toLowerCase();
+  var fl = [];
+  for(var i=0;i<db.members.length;i++) {
+    var m=db.members[i];
+    if((m.nom+' '+m.prenom+' '+m.id+' '+(m.tel||'')+' '+(m.fonction||'')).toLowerCase().indexOf(q)>=0) fl.push(m);
+  }
+  document.getElementById('mcnt').textContent = fl.length + ' membre(s)';
+  if(!fl.length){document.getElementById('mgrid').innerHTML='<div class="empty" style="grid-column:1/-1">Aucun membre</div>';return;}
+  var today=new Date().toISOString().split('T')[0], h='';
+  for(var i=0;i<fl.length;i++) {
+    var m=fl[i], pres=[];
+    for(var j=0;j<db.attendance.length;j++) if(db.attendance[j].muid===m.uid&&db.attendance[j].date===today) pres.push(db.attendance[j]);
+    var badges = pres.length ? '' : '<span class="bdg bdg-r">Absent</span>';
+    for(var j=0;j<pres.length;j++) badges += '<span class="bdg bdg-g">'+pres[j].act.split(' - ')[0]+'</span> ';
+    h += '<div class="mcard"><div class="mctop">'+getAv(m,56)
+      +'<div style="flex:1;min-width:0"><div class="mname">'+m.nom+' '+m.prenom+(m.suspended?' <span style="font-size:0.65rem;background:#f59e0b;color:#fff;padding:0.1rem 0.4rem;border-radius:99px;vertical-align:middle">SUSPENDU</span>':'')+'</div>'
+      +'<div class="mid">'+m.id+'</div>'
+      +(m.fonction?'<div style="font-size:0.72rem;color:#1e3a8a;font-weight:600;margin-top:0.15rem">&#9654; '+m.fonction+'</div>':'')
+      +'<div class="minfo">'+(m.tel?'&#128222; '+m.tel+'<br>':'')+(m.naiss?'&#127874; '+m.naiss:'')+'</div></div></div>'
+      +'<div class="mcbody"><div class="mbadges">'+badges+'</div>'
+      +'<div class="mbtns">'
+      +'<button class="btn bout bsm" data-uid="'+m.uid+'" data-act="edit">&#9998; Modifier</button>'
+      +'<button class="btn bout bsm" data-uid="'+m.uid+'" data-act="qr">QR Code</button>'
+      +'<button class="btn bout bsm" data-uid="'+m.uid+'" data-act="print">Imprimer</button>'
+      +(m.suspended?'<button class="btn bgrn bsm" data-uid="'+m.uid+'" data-act="unsuspend">&#9989; Reactiver</button>':'<button class="btn" style="background:#f59e0b;color:#fff" data-uid="'+m.uid+'" data-act="suspend">&#9940; Suspendre</button>')
+      +'<button class="btn bred bsm" data-uid="'+m.uid+'" data-act="del">Supprimer</button>'
+      +'</div></div></div>';
+  }
+  document.getElementById('mgrid').innerHTML = h;
+}
+
+// ── PRESENCES ──
+function addAtt() {
+  var uid = parseInt(document.getElementById('attm').value);
+  if(!uid){toast('Selectionnez un membre');return;}
+  var act  = document.getElementById('attact').value;
+  var date = document.getElementById('attdate').value || new Date().toISOString().split('T')[0];
+  for(var i=0;i<db.attendance.length;i++) if(db.attendance[i].muid===uid&&db.attendance[i].act===act&&db.attendance[i].date===date){toast('Presence deja enregistree');return;}
+  var m=null; for(var i=0;i<db.members.length;i++) if(db.members[i].uid===uid){m=db.members[i];break;}
+  db.attendance.push({id:Date.now(),muid:uid,mname:m?m.nom+' '+m.prenom:'',act:act,date:date});
+  saveDB(); renderAtt(); toast('Presence enregistree');
+}
+
+function delAtt(id) {
+  openCfm('&#128465;','Supprimer','Supprimer cette presence?',function(){
+    db.attendance=db.attendance.filter(function(a){return a.id!==id;});
+    saveDB(); renderAtt(); toast('Supprime');
+  });
+}
+
+function renderAtt() {
+  var q=(document.getElementById('attsrch').value||'').toLowerCase(), fl=[];
+  for(var i=0;i<db.attendance.length;i++){var a=db.attendance[i];if((a.mname+' '+a.act+' '+a.date).toLowerCase().indexOf(q)>=0)fl.push(a);}
+  if(!fl.length){document.getElementById('attlist').innerHTML='<div class="empty">Aucune presence</div>';return;}
+  var h='';
+  for(var i=fl.length-1;i>=0;i--) {
+    var a=fl[i];
+    h+='<div class="litem"><div><div class="ltitle">'+a.mname+'</div><div class="lsub">'+a.act+'</div></div>'
+      +'<div style="display:flex;align-items:center;gap:0.5rem"><span style="font-size:0.73rem;color:#888">'+a.date+'</span>'
+      +'<button class="btn bred bsm" data-id="'+a.id+'" data-act="delatt">X</button></div></div>';
+  }
+  document.getElementById('attlist').innerHTML=h;
+}
+
+// ── FINANCES ──
+function addFin(type) {
+  if(type==='in'){
+    var uid=parseInt(document.getElementById('fmem').value);
+    var amt=parseFloat(document.getElementById('famtin').value);
+    if(!uid){toast('Selectionnez un membre');return;}
+    if(!amt||amt<=0){toast('Montant invalide');return;}
+    var dateEl=document.getElementById('fdimdate');
+    var fdate=dateEl&&dateEl.value?dateEl.value:new Date().toISOString().split('T')[0];
+    var m=null; for(var i=0;i<db.members.length;i++) if(db.members[i].uid===uid){m=db.members[i];break;}
+    db.finances.push({id:Date.now(),type:'in',ft:'Dime',muid:uid,mname:m?m.nom+' '+m.prenom:'',amount:amt,date:fdate});
+    document.getElementById('famtin').value='';
+    if(dateEl)dateEl.value=new Date().toISOString().split('T')[0];
+    saveDB(); renderFin(); renderDimeList2(); toast('Dime enregistree ✓');
+  } else {
+    var motif=document.getElementById('fmotif').value.trim();
+    var amt=parseFloat(document.getElementById('famtout').value);
+    if(!motif){toast('Precisez le motif');return;}
+    if(!amt||amt<=0){toast('Montant invalide');return;}
+    db.finances.push({id:Date.now(),type:'out',motif:motif,amount:amt,date:new Date().toISOString().split('T')[0]});
+    document.getElementById('fmotif').value=''; document.getElementById('famtout').value='';
+    saveDB(); renderFin(); toast('Depense enregistree ✓');
+  }
+}
+
+function delFin(id) {
+  openCfm('&#128465;','Supprimer','Supprimer cette transaction?',function(){
+    db.finances=db.finances.filter(function(f){return f.id!==id;});
+    saveDB(); renderFin(); toast('Supprime');
+  });
+}
+
+function renderDimeList2(){
+  var el=document.getElementById('dimeList'); if(!el)return;
+  var dimes=db.finances.filter(function(f){return f.ft==='Dime'&&f.type==='in';});
+  dimes.sort(function(a,b){return(b.date||'').localeCompare(a.date||'');});
+  if(!dimes.length){el.innerHTML='<div class="empty">Aucune dime enregistree</div>';return;}
+  var total=0; dimes.forEach(function(d){total+=Number(d.amount||0);});
+  var h='<div style="font-weight:700;color:#16a34a;margin-bottom:0.5rem;font-size:0.85rem">Total: '+total.toLocaleString()+' FCFA</div>';
+  dimes.forEach(function(d){
+    h+='<div class="litem"><div><div class="ltitle">'+d.mname+'</div><div class="lsub">'+d.date+'</div></div>'
+      +'<div style="display:flex;align-items:center;gap:0.5rem"><span style="font-weight:700;color:#16a34a">+'+Number(d.amount||0).toLocaleString()+' FCFA</span>'
+      +'<button class="btn bred bsm" data-id="'+d.id+'" data-act="delfin">X</button></div></div>';
+  });
+  el.innerHTML=h;
+}
+
+function renderFin() {
+  var ti=0, to=0, dimes=0, offTotal=0;
+  var now=new Date();
+  var ym=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  // Compter finances
+  for(var i=0;i<db.finances.length;i++){
+    if(db.finances[i].type==='in'){ti+=db.finances[i].amount;}
+    else{to+=db.finances[i].amount;}
+    // Compter dimes ce mois
+    if(db.finances[i].ft==='Dime'&&db.finances[i].type==='in'&&(db.finances[i].date||'').indexOf(ym)===0) dimes++;
+  }
+  // Compter offrandes
+  if(db.offrandes){for(var i=0;i<db.offrandes.length;i++){if((db.offrandes[i].date||'').indexOf(ym)===0) offTotal+=db.offrandes[i].montant;}}
+  var sol=ti-to;
+  document.getElementById('fsum').innerHTML=
+    '<div class="fin-box"><div class="famt" style="color:#16a34a">'+ti.toLocaleString()+' FCFA</div><div style="font-size:0.7rem;color:#888">Total Entrees</div></div>'
+   +'<div class="fin-box"><div class="famt" style="color:#dc2626">'+to.toLocaleString()+' FCFA</div><div style="font-size:0.7rem;color:#888">Total Depenses</div></div>'
+   +'<div class="fin-box"><div class="famt" style="color:'+(sol>=0?'#1e3a8a':'#dc2626')+'">'+sol.toLocaleString()+' FCFA</div><div style="font-size:0.7rem;color:#888">Solde</div></div>'
+   +'<div class="fin-box"><div class="famt" style="color:#16a34a">'+dimes+'</div><div style="font-size:0.7rem;color:#888">Dimes ce mois</div></div>'
+   +'<div class="fin-box"><div class="famt" style="color:#8b5cf6">'+offTotal.toLocaleString()+' FCFA</div><div style="font-size:0.7rem;color:#888">Offrandes ce mois</div></div>';
+  if(!db.finances.length){document.getElementById('flist').innerHTML='<div class="empty">Aucune transaction</div>';return;}
+  var h='';
+  for(var i=db.finances.length-1;i>=0;i--){
+    var f=db.finances[i];
+    var lbl=f.type==='in'?f.ft+' - '+f.mname:'Depense: '+f.motif;
+    var col=f.type==='in'?'#16a34a':'#dc2626';
+    var sgn=f.type==='in'?'+':'-';
+    h+='<div class="litem"><div><div class="ltitle">'+lbl+'</div><div class="lsub">'+f.date+'</div></div>'
+      +'<div style="display:flex;align-items:center;gap:0.6rem"><span style="font-weight:700;color:'+col+'">'+sgn+(f.amount||0).toLocaleString()+' FCFA</span>'
+      +'<button class="btn bred bsm" data-id="'+f.id+'" data-act="delfin">X</button></div></div>';
+  }
+  document.getElementById('flist').innerHTML=h;
+  renderDimeList2();
+}
+
+// ── COMITES ──
+function addCom() {
+  var nom=document.getElementById('cnom').value.trim();
+  if(!nom){toast('Nom requis');return;}
+  db.committees.push({id:Date.now(),name:nom,resp:document.getElementById('cresp').value.trim(),members:document.getElementById('cmem').value.trim()});
+  document.getElementById('cnom').value=''; document.getElementById('cresp').value=''; document.getElementById('cmem').value='';
+  saveDB(); renderCom(); toast('Departement cree');
+}
+function delCom(id){openCfm('&#128465;','Supprimer','Supprimer ce departement?',function(){db.committees=db.committees.filter(function(c){return c.id!==id;});saveDB();renderCom();toast('Supprime');});}
+function renderCom(){
+  if(!db.committees.length){document.getElementById('comlist').innerHTML='<div class="empty">Aucun departement</div>';return;}
+  var h='';
+  for(var i=0;i<db.committees.length;i++){var c=db.committees[i];
+    h+='<div class="card" style="display:flex;justify-content:space-between;align-items:flex-start">'
+      +'<div><div style="font-weight:600;font-size:0.92rem">'+c.name+'</div>'
+      +(c.resp?'<div style="font-size:0.78rem;color:#888;margin-top:0.2rem">Responsable: '+c.resp+'</div>':'')
+      +(c.members?'<div style="font-size:0.78rem;color:#888;margin-top:0.1rem">Membres: '+c.members+'</div>':'')
+      +'</div><button class="btn bred bsm" data-id="'+c.id+'" data-act="delcom">Supprimer</button></div>';
+  }
+  document.getElementById('comlist').innerHTML=h;
+}
+
+// ── CALENDRIER ──
+function addEv(){
+  var tit=document.getElementById('evtit').value.trim();
+  if(!tit){toast('Titre requis');return;}
+  db.events.push({id:Date.now(),title:tit,date:document.getElementById('evdate').value,desc:document.getElementById('evdesc').value.trim()});
+  document.getElementById('evtit').value=''; document.getElementById('evdate').value=''; document.getElementById('evdesc').value='';
+  saveDB(); renderEv(); toast('Evenement ajoute');
+}
+function delEv(id){openCfm('&#128465;','Supprimer','Supprimer cet evenement?',function(){db.events=db.events.filter(function(e){return e.id!==id;});saveDB();renderEv();toast('Supprime');});}
+function renderEv(){
+  if(!db.events.length){document.getElementById('evlist').innerHTML='<div class="empty">Aucun evenement</div>';return;}
+  var sorted=db.events.slice().sort(function(a,b){return(a.date||'').localeCompare(b.date||'');});
+  var h='';
+  for(var i=0;i<sorted.length;i++){var e=sorted[i];
+    h+='<div class="evitem"><div><div style="font-weight:500;font-size:0.88rem">'+e.title+'</div>'
+      +(e.desc?'<div style="font-size:0.74rem;color:#888">'+e.desc+'</div>':'')+'</div>'
+      +'<div style="display:flex;align-items:center;gap:0.6rem">'
+      +(e.date?'<span style="font-size:0.74rem;color:#888;white-space:nowrap">'+e.date+'</span>':'')
+      +'<button class="btn bred bsm" data-id="'+e.id+'" data-act="delev">X</button></div></div>';
+  }
+  document.getElementById('evlist').innerHTML=h;
+}
+
+// ── DOCUMENTS ──
+function addDoc(){
+  var tit = document.getElementById('doctit').value.trim();
+  var cat = document.getElementById('doccat').value;
+  var file = document.getElementById('docfile').files[0];
+  if(!tit){ toast('Titre requis'); return; }
+  if(!file){ toast('Selectionnez un fichier'); return; }
+  var r = new FileReader();
+  r.onload = function(e){
+    db.docs.push({id:Date.now(), title:tit, cat:cat, name:file.name, type:file.type, size:file.size, data:e.target.result, date:new Date().toISOString().split('T')[0]});
+    document.getElementById('doctit').value=''; document.getElementById('docfile').value='';
+    saveDB(); renderDocs(); toast('Document enregistre');
+  };
+  r.readAsDataURL(file);
+}
+function delDoc(id){
+  openCfm('&#128465;','Supprimer','Supprimer ce document?',function(){
+    db.docs=db.docs.filter(function(d){return d.id!==id;}); saveDB(); renderDocs(); toast('Supprime');
+  });
+}
+function renderDocs(){
+  if(!db.docs||!db.docs.length){ document.getElementById('doclist').innerHTML='<div class="empty">Aucun document televerse</div>'; return; }
+  var icons={'application/pdf':'&#128196;','application/msword':'&#128196;','image/png':'&#128247;','image/jpeg':'&#128247;'};
+  var h='';
+  for(var i=db.docs.length-1;i>=0;i--){
+    var d=db.docs[i];
+    var ico=icons[d.type]||'&#128196;';
+    var sz=d.size>1048576?(d.size/1048576).toFixed(1)+' Mo':(d.size/1024).toFixed(0)+' Ko';
+    h+='<div class="litem" style="flex-wrap:wrap;gap:0.5rem">'
+      +'<div style="display:flex;align-items:center;gap:0.7rem;flex:1;min-width:0">'
+      +'<span style="font-size:1.5rem">'+ico+'</span>'
+      +'<div><div class="ltitle" style="word-break:break-word">'+d.title+'</div>'
+      +'<div class="lsub">'+d.cat+' &bull; '+d.name+' &bull; '+sz+' &bull; '+d.date+'</div></div></div>'
+      +'<div style="display:flex;gap:0.4rem;flex-shrink:0">'
+      +'<a href="'+d.data+'" download="'+d.name+'" class="btn bgrn bsm">&#11015; Telecharger</a>'
+      +'<button class="btn bred bsm" data-id="'+d.id+'" data-act="deldoc">X</button>'
+      +'</div></div>';
+  }
+  document.getElementById('doclist').innerHTML=h;
+}
+
+// ── BIBLIOTHEQUE ──
+function addBook(){
+  var tit=document.getElementById('btit').value.trim();
+  if(!tit){toast('Titre requis');return;}
+  var cf=document.getElementById('bcover').files[0];
+  function doSaveBook(cv){
+    db.books.push({id:Date.now(),title:tit,author:document.getElementById('baut').value.trim(),
+      cat:document.getElementById('bcat').value,avail:document.getElementById('bavail').value,
+      year:document.getElementById('byr').value.trim(),qty:parseInt(document.getElementById('bqty').value)||1,
+      desc:document.getElementById('bdesc').value.trim(),cover:cv||'',added:new Date().toISOString().split('T')[0]});
+    document.getElementById('btit').value=''; document.getElementById('baut').value='';
+    document.getElementById('byr').value=''; document.getElementById('bqty').value='';
+    document.getElementById('bdesc').value=''; document.getElementById('bcover').value='';
+    saveDB(); renderBooks(); toast('Livre enregistre');
+  }
+  if(cf){var r=new FileReader();r.onload=function(e){doSaveBook(e.target.result);};r.readAsDataURL(cf);}
+  else doSaveBook('');
+}
+function delBook(id){openCfm('&#128465;','Supprimer','Supprimer ce livre?',function(){db.books=db.books.filter(function(b){return b.id!==id;});saveDB();renderBooks();toast('Supprime');});}
+function updBookAvail(id,val){for(var i=0;i<db.books.length;i++)if(db.books[i].id===id){db.books[i].avail=val;break;}saveDB();toast('Disponibilite mise a jour');}
+function renderBooks(){
+  var q=(document.getElementById('bsrch').value||'').toLowerCase();
+  var fc=document.getElementById('bfcat').value;
+  var fl=[];
+  for(var i=0;i<db.books.length;i++){var b=db.books[i];if((b.title+' '+(b.author||'')).toLowerCase().indexOf(q)<0)continue;if(fc&&b.cat!==fc)continue;fl.push(b);}
+  var total=db.books.length,dispo=0,empr=0;
+  for(var i=0;i<db.books.length;i++){if(db.books[i].avail==='Disponible')dispo++;if(db.books[i].avail==='Emprunte')empr++;}
+  document.getElementById('libstats').innerHTML='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0.7rem">'
+    +'<div class="kbox"><div class="knum">'+total+'</div><div class="klbl">Total livres</div></div>'
+    +'<div class="kbox" style="border-top-color:#16a34a"><div class="knum" style="color:#16a34a">'+dispo+'</div><div class="klbl">Disponibles</div></div>'
+    +'<div class="kbox" style="border-top-color:#ca8a04"><div class="knum" style="color:#ca8a04">'+empr+'</div><div class="klbl">Empruntes</div></div></div>';
+  if(!fl.length){document.getElementById('booklist').innerHTML='<div class="empty">Aucun livre</div>';return;}
+  var ac={'Disponible':'#16a34a','Emprunte':'#ca8a04','En commande':'#888','Archive':'#dc2626'};
+  var h='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem">';
+  for(var i=0;i<fl.length;i++){var b=fl[i];var c2=ac[b.avail]||'#888';
+    var opts=['Disponible','Emprunte','En commande','Archive'];
+    var sel='<select data-id="'+b.id+'" data-act="bookavail" style="padding:0.25rem 0.5rem;font-size:0.73rem;border-color:'+c2+';color:'+c2+';background:#fff;border-radius:4px;border:1px solid;outline:none">';
+    for(var j=0;j<opts.length;j++) sel+='<option'+(opts[j]===b.avail?' selected':'')+'>'+opts[j]+'</option>';
+    sel+='</select>';
+    h+='<div class="card" style="border-top:3px solid #1e3a8a">'
+      +'<div style="display:flex;gap:0.9rem;align-items:flex-start">'
+      +(b.cover?'<img src="'+b.cover+'" style="width:52px;height:70px;border-radius:6px;object-fit:cover;flex-shrink:0">'
+               :'<div class="bkcv">&#128213;</div>')
+      +'<div style="flex:1;min-width:0">'
+      +'<div style="font-weight:600;font-size:0.9rem;line-height:1.3">'+b.title+'</div>'
+      +(b.author?'<div style="font-size:0.75rem;color:#888;margin-top:0.15rem">'+b.author+'</div>':'')
+      +'<div style="font-size:0.72rem;color:#1e3a8a;margin-top:0.2rem">'+b.cat+'</div>'
+      +(b.year?'<div style="font-size:0.7rem;color:#aaa;margin-top:0.1rem">'+b.year+' - '+b.qty+' ex.</div>':'')
+      +(b.desc?'<div style="font-size:0.74rem;color:#888;margin-top:0.3rem;line-height:1.4">'+b.desc+'</div>':'')
+      +'</div></div>'
+      +'<div style="display:flex;align-items:center;justify-content:space-between;margin-top:0.8rem;padding-top:0.7rem;border-top:1px solid #f3f4f6">'+sel
+      +'<button class="btn bred bsm" data-id="'+b.id+'" data-act="delbook">Supprimer</button></div></div>';
+  }
+  h+='</div>';
+  document.getElementById('booklist').innerHTML=h;
+}
+
+// ── CONFIG ──
+function renderCfg(){
+  document.getElementById('cfgname').value=cfg.name;
+  document.getElementById('cfgsub').value=cfg.sub;
+  document.getElementById('cfgtel').value=cfg.tel||'';
+  if(db.logo) document.getElementById('cfglogoprev').innerHTML='<img src="'+db.logo+'" style="width:55px;height:55px;border-radius:50%;object-fit:cover;border:2px solid #1e3a8a">';
+  loadDashCfg();
+}
+function saveCfg(){
+  var n=document.getElementById('cfgname').value.trim();
+  var s=document.getElementById('cfgsub').value.trim();
+  var t=document.getElementById('cfgtel').value.trim();
+  if(n) cfg.name=n; if(s) cfg.sub=s; if(t) cfg.tel=t;
+  saveDB(); applyConfig(); toast('Configuration enregistree');
+}
+function chgPass(){
+  var p1=document.getElementById('np1').value;
+  var p2=document.getElementById('np2').value;
+  if(!p1){toast('Entrez un mot de passe');return;}
+  if(p1!==p2){toast('Mots de passe differents');return;}
+  cfg.pass=p1; saveDB();
+  document.getElementById('np1').value=''; document.getElementById('np2').value='';
+  toast('Mot de passe mis a jour');
+}
+
+function saveDashConfig(){
+  cfg.dash = {
+    membres    : document.getElementById('dashMembres').checked,
+    presenceMois: document.getElementById('dashPresence').checked,
+    departement: document.getElementById('dashDept').checked,
+    livres     : document.getElementById('dashLivres').checked,
+    activites  : document.getElementById('dashActivites').checked,
+    finances   : document.getElementById('dashFinances').checked,
+    autres     : document.getElementById('dashAutres').value.trim()
+  };
+  saveDB(); renderDash(); toast('Tableau de bord mis a jour ✓');
+}
+function loadDashCfg(){
+  var d = cfg.dash||{};
+  document.getElementById('dashMembres').checked  = d.membres!==false;
+  document.getElementById('dashPresence').checked  = d.presenceMois!==false;
+  document.getElementById('dashDept').checked      = d.departement!==false;
+  document.getElementById('dashLivres').checked    = d.livres!==false;
+  document.getElementById('dashActivites').checked = d.activites!==false;
+  document.getElementById('dashFinances').checked  = d.finances!==false;
+  document.getElementById('dashAutres').value      = d.autres||'';
+}
+function fillSelects(){
+  var opts='<option value="">Selectionner</option>';
+  for(var i=0;i<db.members.length;i++){var m=db.members[i];opts+='<option value="'+m.uid+'">'+m.nom+' '+m.prenom+' ('+m.id+')</option>';}
+  var ids=['attm','fmem'];
+  for(var i=0;i<ids.length;i++){var el=document.getElementById(ids[i]);if(el)el.innerHTML=opts;}
+  var offM=document.getElementById('offMembre');
+  if(offM){offM.innerHTML='<option value="">-- General --</option>'+opts.replace('<option value="">Selectionner</option>','');}
+}
+
+// ── QR CODE ──
+function getQRText(m){
+  // QR court et scannable - uniquement l'identite essentielle
+  var now = new Date();
+  var ym  = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+  var presMois=0, dime=0;
+  for(var i=0;i<db.attendance.length;i++) if(db.attendance[i].muid===m.uid&&(db.attendance[i].date||'').indexOf(ym)===0) presMois++;
+  for(var i=0;i<db.finances.length;i++){var f=db.finances[i];if(f.type==='in'&&f.muid===m.uid&&(f.date||'').indexOf(ym)===0){if(f.ft==='Dime')dime+=f.amount;}}
+  var parts = [
+    cfg.name,
+    m.nom+' '+m.prenom,
+    'ID:'+m.id
+  ];
+  if(m.naiss) parts.push('NEE:'+m.naiss);
+  if(m.lieu)  parts.push('LIEU:'+m.lieu);
+  if(m.tel)   parts.push('TEL:'+m.tel);
+  parts.push('PRES:'+presMois);
+  parts.push('DIME:'+(dime>0?'OUI':'NON'));
+  parts.push(now.toISOString().split('T')[0]);
+  return parts.join('|');
+}
+
+function getQRDetails(m){
+  // Texte long affiche sous le QR (pas dans le QR lui-meme)
+  var now = new Date();
+  var ym  = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0');
+  var moisNom = MOIS[now.getMonth()] + ' ' + now.getFullYear();
+  var presMois=0, presTotal=0, dimeMois=false, dimeTotal=0;
+  for(var i=0;i<db.attendance.length;i++){var a=db.attendance[i];if(a.muid!==m.uid)continue;presTotal++;if((a.date||'').indexOf(ym)===0)presMois++;}
+  for(var i=0;i<db.finances.length;i++){var f=db.finances[i];if(f.type!=='in'||f.muid!==m.uid)continue;if((f.date||'').indexOf(ym)===0){if(f.ft==='Dime')dimeMois=true;}if(f.ft==='Dime'&&f.amount>0)dimeTotal+=f.amount;}
+
+  // Trouver les departements du membre
+  var fullName = (m.nom+' '+m.prenom).toLowerCase();
+  var depts = [];
+  for(var i=0;i<db.committees.length;i++){
+    var c = db.committees[i];
+    var membersField = (c.members||'').toLowerCase();
+    var respField    = (c.resp||'').toLowerCase();
+    if(membersField.indexOf(fullName)>=0 || respField.indexOf(fullName)>=0){
+      depts.push(c.name + (respField.indexOf(fullName)>=0 ? ' (Responsable)' : ''));
+    }
+  }
+
+  var lines=[];
+  lines.push('== '+cfg.name+' ==');
+  lines.push('NOM      : '+m.nom+' '+m.prenom);
+  lines.push('ID       : '+m.id);
+  if(m.fonction) lines.push('FONCTION : '+m.fonction);
+  if(m.naiss) lines.push('NAISS.   : '+m.naiss);
+  if(m.lieu)  lines.push('LIEU     : '+m.lieu);
+  if(m.tel)   lines.push('TEL      : '+m.tel);
+  lines.push('');
+  if(depts.length>0){
+    lines.push('DEPARTEMENT(S) :');
+    for(var i=0;i<depts.length;i++) lines.push('  - '+depts[i]);
+    lines.push('');
+  } else {
+    lines.push('DEPARTEMENT(S) : Aucun');
+    lines.push('');
+  }
+  lines.push('['+moisNom+']');
+  lines.push('Presences ce mois : '+presMois+' | Total : '+presTotal);
+  lines.push('Dime ce mois      : '+(dimeMois?'✓ OUI':'✗ NON'));
+  lines.push('Total Dimes       : '+dimeTotal.toLocaleString()+' FCFA');
+  return lines.join('\n');
+}
+
+function buildQR(text){
+  var EXP=[],LOG=[],xi=1;
+  for(var i=0;i<512;i++) EXP.push(0);
+  for(var i=0;i<256;i++) LOG.push(0);
+  for(var i=0;i<255;i++){EXP[i]=xi;LOG[xi]=i;xi=xi<128?xi*2:(xi*2)^0x11D;}
+  EXP[255]=EXP[0];
+  for(var i=256;i<512;i++) EXP[i]=EXP[i-255];
+  function gm(a,b){return(!a||!b)?0:EXP[(LOG[a]+LOG[b])%255];}
+  function gp(n){var p=[1];for(var i=0;i<n;i++){var q=[1,EXP[i]],r=[];for(var k=0;k<p.length+q.length-1;k++)r.push(0);for(var a=0;a<p.length;a++)for(var b=0;b<q.length;b++)r[a+b]^=gm(p[a],q[b]);p=r;}return p;}
+  function rs(d,n){var g=gp(n),m=d.slice();for(var i=0;i<n;i++)m.push(0);for(var i=0;i<d.length;i++){var c=m[i];if(c)for(var j=0;j<g.length;j++)m[i+j]^=gm(g[j],c);}return m.slice(d.length);}
+  var CAP={1:[21,16,10,1],2:[25,28,16,1],3:[29,44,26,2],4:[33,64,36,2],5:[37,86,48,2],6:[41,108,64,4],7:[45,124,72,4],8:[49,154,88,4],9:[53,182,110,5],10:[57,216,130,5]};
+  var ALN={2:[6,18],3:[6,22],4:[6,26],5:[6,30],6:[6,34],7:[6,22,38],8:[6,24,42],9:[6,26,46],10:[6,28,50]};
+  var FT=[[1,0,1,0,1,0,0,0,0,0,1,0,0,1,0],[1,0,1,0,0,1,1,0,1,1,1,0,1,1,1],[1,0,1,1,1,1,0,0,1,0,0,1,1,0,1],[1,0,1,1,0,0,1,0,0,1,0,1,0,0,0],[1,0,0,0,1,0,1,1,0,1,0,1,1,1,0],[1,0,0,0,0,1,0,1,1,0,0,1,0,1,1],[1,0,0,1,1,1,1,1,1,1,1,0,0,0,1],[1,0,0,1,0,0,0,1,0,0,1,0,1,0,0]];
+  function mk(ms,r,c){if(ms===0)return(r+c)%2===0;if(ms===1)return r%2===0;if(ms===2)return c%3===0;if(ms===3)return(r+c)%3===0;if(ms===4)return(Math.floor(r/2)+Math.floor(c/3))%2===0;if(ms===5)return(r*c)%2+(r*c)%3===0;if(ms===6)return((r*c)%2+(r*c)%3)%2===0;return((r+c)%2+(r*c)%3)%2===0;}
+  var by=[];
+  for(var i=0;i<text.length;i++){var ch=text.charCodeAt(i);if(ch<128)by.push(ch);else if(ch<2048){by.push(0xC0|(ch>>6));by.push(0x80|(ch&63));}else{by.push(0xE0|(ch>>12));by.push(0x80|((ch>>6)&63));by.push(0x80|(ch&63));}}
+  var ver=1;for(var i=1;i<=10;i++){if(CAP[i][1]>=by.length+2){ver=i;break;}}
+  var SZ=CAP[ver][0],D=CAP[ver][1],N=CAP[ver][2],B=CAP[ver][3];
+  var bits=[];
+  function push(v,n){for(var k=n-1;k>=0;k--)bits.push((v>>k)&1);}
+  push(4,4);push(Math.min(by.length,D-2),8);
+  for(var i=0;i<Math.min(by.length,D-2);i++)push(by[i],8);
+  for(var i=0;i<4&&bits.length<D*8;i++)bits.push(0);
+  while(bits.length%8)bits.push(0);
+  var pad=[0xEC,0x11],pi=0;while(bits.length<D*8)push(pad[pi++%2],8);
+  var db2=[];for(var i=0;i<bits.length;i+=8){var v=0;for(var j=0;j<8;j++)v=(v<<1)|bits[i+j];db2.push(v);}
+  var bsz=Math.floor(D/B),esz=N/B,blocks=[];
+  for(var i=0;i<B;i++){var d=db2.slice(i*bsz,(i+1)*bsz);blocks.push([d,rs(d,esz)]);}
+  var fin=[],md=0;for(var i=0;i<blocks.length;i++)if(blocks[i][0].length>md)md=blocks[i][0].length;
+  for(var i=0;i<md;i++)for(var j=0;j<blocks.length;j++)if(i<blocks[j][0].length)fin.push(blocks[j][0][i]);
+  var me=blocks[0][1].length;for(var i=0;i<me;i++)for(var j=0;j<blocks.length;j++)fin.push(blocks[j][1][i]);
+  var fb=[];for(var i=0;i<fin.length;i++)for(var k=7;k>=0;k--)fb.push((fin[i]>>k)&1);
+  var rem=[0,7,7,7,7,7,0,0,0,0,0];for(var i=0;i<(rem[ver]||0);i++)fb.push(0);
+  var M=[],F=[];for(var i=0;i<SZ;i++){M.push([]);F.push([]);for(var j=0;j<SZ;j++){M[i].push(null);F[i].push(0);}}
+  function sM(r,c,val){if(r>=0&&r<SZ&&c>=0&&c<SZ){M[r][c]=val;F[r][c]=1;}}
+  function fi(r0,c0){for(var dr=-1;dr<=7;dr++)for(var dc=-1;dc<=7;dc++){var ins=dr>=0&&dr<=6&&dc>=0&&dc<=6;sM(r0+dr,c0+dc,ins&&(dr===0||dr===6||dc===0||dc===6||dr>=2&&dr<=4&&dc>=2&&dc<=4)?1:0);}}
+  fi(0,0);fi(0,SZ-7);fi(SZ-7,0);
+  for(var i=8;i<SZ-8;i++){if(!F[6][i])sM(6,i,i%2?0:1);if(!F[i][6])sM(i,6,i%2?0:1);}
+  sM(SZ-8,8,1);
+  if(ver>=2){var ap=ALN[ver]||[];for(var ai=0;ai<ap.length;ai++)for(var aj=0;aj<ap.length;aj++){var ar=ap[ai],ac=ap[aj];if(F[ar][ac])continue;for(var dr=-2;dr<=2;dr++)for(var dc=-2;dc<=2;dc++)sM(ar+dr,ac+dc,Math.abs(dr)===2||Math.abs(dc)===2||(dr===0&&dc===0)?1:0);}}
+  for(var i=0;i<9;i++){F[8][i]=1;F[i][8]=1;}for(var i=SZ-8;i<SZ;i++){F[8][i]=1;F[i][8]=1;}
+  var bii=0;for(var col=SZ-1;col>=1;col-=2){if(col===6)col--;for(var row=0;row<SZ;row++)for(var j=0;j<2;j++){var cc=col-j,rr=((col+1)&2)?SZ-1-row:row;if(!F[rr][cc])M[rr][cc]=bii<fb.length?fb[bii++]:0;}}
+  function pen(mat){var p=0,rn,dk=0;for(var r=0;r<SZ;r++){rn=1;for(var c=1;c<SZ;c++){if(mat[r][c]===mat[r][c-1])rn++;else{if(rn>=5)p+=rn-2;rn=1;}}if(rn>=5)p+=rn-2;}for(var c=0;c<SZ;c++){rn=1;for(var r=1;r<SZ;r++){if(mat[r][c]===mat[r-1][c])rn++;else{if(rn>=5)p+=rn-2;rn=1;}}if(rn>=5)p+=rn-2;}for(var r=0;r<SZ-1;r++)for(var c=0;c<SZ-1;c++)if(mat[r][c]===mat[r+1][c]&&mat[r][c]===mat[r][c+1]&&mat[r][c]===mat[r+1][c+1])p+=3;for(var r=0;r<SZ;r++)for(var c=0;c<SZ;c++)if(mat[r][c])dk++;p+=Math.abs(Math.round(dk/(SZ*SZ)*100/5)*5-50)/5*10;return p;}
+  var bm=0,bs=Infinity;
+  for(var ms=0;ms<8;ms++){var tmp=[];for(var r=0;r<SZ;r++){tmp.push([]);for(var c=0;c<SZ;c++)tmp[r].push(F[r][c]?M[r][c]:(mk(ms,r,c)?M[r][c]^1:M[r][c]));}var sc=pen(tmp);if(sc<bs){bs=sc;bm=ms;}}
+  for(var r=0;r<SZ;r++)for(var c=0;c<SZ;c++)if(!F[r][c]&&mk(bm,r,c))M[r][c]^=1;
+  var fmt=FT[bm];var fp=[[8,0],[8,1],[8,2],[8,3],[8,4],[8,5],[8,7],[8,8],[7,8],[5,8],[4,8],[3,8],[2,8],[1,8],[0,8]];
+  for(var i=0;i<fp.length;i++)M[fp[i][0]][fp[i][1]]=fmt[i];
+  for(var i=0;i<7;i++)M[SZ-1-i][8]=fmt[i];for(var i=7;i<15;i++)M[8][SZ-15+i]=fmt[i];
+  var cell=Math.max(2,Math.floor(240/(SZ+8))),q2=4*cell,tot=(SZ+8)*cell,rects='';
+  for(var r=0;r<SZ;r++)for(var c=0;c<SZ;c++)if(M[r][c])rects+='<rect x="'+(q2+c*cell)+'" y="'+(q2+r*cell)+'" width="'+cell+'" height="'+cell+'"/>';
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="'+tot+'" height="'+tot+'"><rect width="'+tot+'" height="'+tot+'" fill="white"/><g fill="black">'+rects+'</g></svg>';
+}
+
+function showQR(uid){
+  var m=null;
+  for(var i=0;i<db.members.length;i++) if(db.members[i].uid===uid){m=db.members[i];break;}
+  if(!m) return;
+  var qrText  = getQRText(m);    // court = scannable
+  var details = getQRDetails(m); // long  = affiche en texte sous le QR
+  document.getElementById('qrtitle').textContent = m.prenom+' '+m.nom+' — '+m.id;
+  document.getElementById('qrtxt').textContent = details;
+  var wrap = document.getElementById('qrimg');
+  wrap.innerHTML = '';
+  try {
+    new QRCode(wrap, {
+      text        : qrText,
+      width       : 260,
+      height      : 260,
+      colorDark   : '#000000',
+      colorLight  : '#ffffff',
+      correctLevel: QRCode.CorrectLevel.L
+    });
+  } catch(e) {
+    wrap.innerHTML = '<div style="padding:1rem;color:#c00;font-size:0.78rem;text-align:center">Erreur QR : '+e.message+'</div>';
+  }
+  openModal('qrmodal');
+}
+
+function printCard(uid){
+  var m=null;for(var i=0;i<db.members.length;i++)if(db.members[i].uid===uid){m=db.members[i];break;}
+  if(!m)return;
+  var qrText  = getQRText(m);
+  var details = getQRDetails(m);
+  var w=window.open('','_blank');
+  if(!w){toast('Autorisez les popups');return;}
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>'+m.nom+'</title>'
+    +'<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"><\/script>'
+    +'<style>body{font-family:Arial;padding:20px;max-width:420px;}.p{background:#1e3a8a;color:#fff;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;margin-bottom:16px;}h2{color:#1e3a8a;margin:0}hr{margin:10px 0}@media print{.p{display:none!important;}}</style>'
+    +'</head><body><button class="p" onclick="window.print()">Imprimer / PDF</button>'
+    +(m.photo?'<img src="'+m.photo+'" style="width:80px;height:80px;border-radius:8px;object-fit:cover;float:right;border:2px solid #1e3a8a">':'')
+    +'<h2>'+m.nom+' '+m.prenom+'</h2>'
+    +'<p style="font-family:monospace;color:#1e3a8a;margin:4px 0">'+m.id+'</p>'
+    +(m.fonction?'<p style="color:#1e3a8a;font-size:0.85rem;font-weight:600;margin:4px 0">&#9654; '+m.fonction+'</p>':'')
+    +'<hr>'
+    +'<p style="font-size:0.85rem;line-height:1.9;margin:0">'
+      +(m.tel  ?'📞 '+m.tel+'<br>':'')
+      +(m.naiss?'🎂 '+m.naiss+(m.lieu?' — '+m.lieu:'')+'<br>':'')
+      +(m.adr  ?'📍 '+m.adr+'<br>':'')
+    +'</p><hr>'
+    +'<div id="qrdiv" style="margin:12px 0;text-align:center"></div><hr>'
+    +'<pre style="font-size:0.72rem;background:#f9fafb;padding:10px;border-radius:6px;white-space:pre-wrap;line-height:1.6">'+details+'</pre>'
+    +'<script>new QRCode(document.getElementById("qrdiv"),{text:'+JSON.stringify(qrText)+',width:220,height:220,colorDark:"#000",colorLight:"#fff",correctLevel:QRCode.CorrectLevel.L});<\/script>'
+    +'</body></html>');
+  w.document.close();
+}
+
+// ── PORTAIL MEMBRE ──
+function openPortal(){
+  // Admin mode - show member PIN entry
+  if(document.getElementById('app-header')&&!document.getElementById('app-header').classList.contains('hide')){
+    var opts='<option value="">-- Choisir un membre --</option>';
+    db.members.forEach(function(m){opts+='<option value="'+m.uid+'">'+m.nom+' '+m.prenom+' ('+m.id+')</option>';});
+    var sel=document.createElement('div');
+    sel.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9000;display:flex;align-items:center;justify-content:center;padding:1rem';
+    sel.innerHTML='<div style="background:#fff;border-radius:14px;padding:1.5rem;width:100%;max-width:360px">'
+      +'<div style="font-size:1rem;font-weight:700;color:#1e3a8a;margin-bottom:1rem">&#128100; Espace Membre</div>'
+      +'<select id="adminMemberPick" style="width:100%;padding:0.7rem;border:1px solid #e2e8f0;border-radius:8px;font-size:0.88rem;margin-bottom:0.8rem">'+opts+'</select>'
+      +'<div class="ffield" style="margin-bottom:1rem"><label class="flbl">Code PIN du membre</label>'
+      +'<input type="password" id="adminMemberPin" class="finp" placeholder="1234" maxlength="6"></div>'
+      +'<div style="display:flex;gap:0.5rem">'
+      +'<button id="btnPickMember" style="flex:1;background:#1e3a8a;color:#fff;border:none;padding:0.7rem;border-radius:8px;cursor:pointer;font-weight:600">Voir la fiche</button>'
+      +'<button id="btnCancelPick" style="flex:1;background:#f9fafb;border:1px solid #e2e8f0;padding:0.7rem;border-radius:8px;cursor:pointer">Annuler</button>'
+      +'</div>'
+      +'<div id="adminPickErr" style="color:red;font-size:0.78rem;margin-top:0.5rem;display:none">PIN incorrect</div>'
+      +'</div>';
+    document.body.appendChild(sel);
+    document.getElementById('btnCancelPick').addEventListener('click',function(){document.body.removeChild(sel);});
+    document.getElementById('btnPickMember').addEventListener('click',function(){
+      var uid=parseInt(document.getElementById('adminMemberPick').value);
+      var pin=document.getElementById('adminMemberPin').value.trim();
+      var err=document.getElementById('adminPickErr');
+      if(!uid){err.style.display='block';err.textContent='Selectionnez un membre';return;}
+      var found=null;
+      for(var i=0;i<db.members.length;i++) if(db.members[i].uid===uid){found=db.members[i];break;}
+      if(!found){err.style.display='block';err.textContent='Membre introuvable';return;}
+      if(found.pin&&pin!==found.pin){err.style.display='block';err.textContent='Code PIN incorrect';return;}
+      document.body.removeChild(sel);
+      curMember=found;
+      loadPortal(found);
+      document.getElementById('mportal').classList.add('open');
+    });
+  } else {
+    // Member login via PIN screen
+    pinVal='';updPin();
+    document.getElementById('pinerr').style.display='none';
+    if(db.logo) document.getElementById('pinlogo').innerHTML='<img src="'+db.logo+'" style="width:60px;height:60px;border-radius:50%;border:3px solid #1e3a8a;object-fit:cover">';
+    document.getElementById('pinscr').classList.add('open');
+  }
+}
+function closePortal(){ document.getElementById('mportal').classList.remove('open'); curMember=null; }
+function closePinScr(){ document.getElementById('pinscr').classList.remove('open'); }
+function pinPress(k){ if(pinVal.length>=4)return; pinVal+=k; updPin(); if(pinVal.length===4)setTimeout(checkPin,150); }
+function pinDel(){ pinVal=pinVal.slice(0,-1); updPin(); }
+function pinClr(){ pinVal=''; updPin(); }
+function updPin(){ var d=''; for(var i=0;i<4;i++)d+=(i<pinVal.length?'●':'_')+(i<3?' ':''); document.getElementById('pindsp').textContent=d; }
+function checkPin(){
+  var found=null;
+  for(var i=0;i<db.members.length;i++) if(db.members[i].pin&&db.members[i].pin===pinVal){found=db.members[i];break;}
+  if(found){ curMember=found; closePinScr(); loadPortal(found); document.getElementById('mportal').classList.add('open'); }
+  else{ document.getElementById('pinerr').style.display='block'; pinVal=''; updPin(); }
+}
+
+function loadPortal(m){
+  document.getElementById('pchname').textContent=cfg.name;
+  if(db.logo) document.getElementById('plogo').innerHTML='<img src="'+db.logo+'">';
+  var av=document.getElementById('pavwrap');
+  av.innerHTML=m.photo?'<img class="pav" src="'+m.photo+'">'
+    :'<div class="pavtxt">'+m.nom[0]+m.prenom[0]+'</div>';
+  document.getElementById('pmname').textContent=m.prenom+' '+m.nom;
+  document.getElementById('pmid').textContent=m.id;
+  // Afficher la fonction sous le nom
+  var fonctionDiv=document.getElementById('pmfonction');
+  if(!fonctionDiv){
+    fonctionDiv=document.createElement('div');
+    fonctionDiv.id='pmfonction';
+    fonctionDiv.style.cssText='font-size:0.82rem;color:#1e3a8a;font-weight:700;margin-top:0.3rem;background:#eff6ff;padding:0.25rem 0.6rem;border-radius:99px;display:inline-block';
+    document.getElementById('pmid').insertAdjacentElement('afterend',fonctionDiv);
+  }
+  fonctionDiv.textContent=m.fonction||'';
+  fonctionDiv.style.display=m.fonction?'inline-block':'none';
+  var info='';
+  if(m.tel)  info+='<div style="background:#f9fafb;border-radius:8px;padding:0.8rem"><div style="font-size:0.68rem;color:#888;margin-bottom:0.2rem">TELEPHONE</div><div style="font-size:0.88rem;font-weight:600">'+m.tel+'</div></div>';
+  if(m.fonction)info+='<div style="background:#eff6ff;border-radius:8px;padding:0.8rem;border-left:3px solid #1e3a8a"><div style="font-size:0.68rem;color:#888;margin-bottom:0.2rem">FONCTION</div><div style="font-size:0.88rem;font-weight:600;color:#1e3a8a">'+m.fonction+'</div></div>';
+  if(m.naiss)info+='<div style="background:#f9fafb;border-radius:8px;padding:0.8rem"><div style="font-size:0.68rem;color:#888;margin-bottom:0.2rem">NAISSANCE</div><div style="font-size:0.88rem;font-weight:600">'+m.naiss+(m.lieu?' - '+m.lieu:'')+'</div></div>';
+  if(m.adr)  info+='<div style="background:#f9fafb;border-radius:8px;padding:0.8rem"><div style="font-size:0.68rem;color:#888;margin-bottom:0.2rem">ADRESSE</div><div style="font-size:0.88rem;font-weight:600">'+m.adr+'</div></div>';
+  document.getElementById('pminfo').innerHTML=info;
+  var now=new Date(),ym=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  var moisNom=['Janvier','Fevrier','Mars','Avril','Mai','Juin','Juillet','Aout','Septembre','Octobre','Novembre','Decembre'][now.getMonth()]+' '+now.getFullYear();
+  var mPres=0;
+  for(var i=0;i<db.attendance.length;i++) if(Number(db.attendance[i].muid)===Number(m.uid)&&(db.attendance[i].date||'').indexOf(ym)===0) mPres++;
+  var dimePaye=db.finances.some(function(f){return f.ft==='Dime'&&f.type==='in'&&Number(f.muid)===Number(m.uid)&&(f.date||'').indexOf(ym)===0;});
+  document.getElementById('pmstats').innerHTML=
+    '<div class="sbox"><div class="snum">'+mPres+'</div><div class="slbl">Presences ce mois</div></div>'
+   +'<div class="sbox" style="border-top-color:'+(dimePaye?'#16a34a':'#dc2626')+'"><div style="font-size:2rem;line-height:1">'+(dimePaye?'&#9989;':'&#10060;')+'</div><div class="slbl" style="color:'+(dimePaye?'#16a34a':'#dc2626')+';font-weight:700">'+(dimePaye?'Dime versee ce mois':'Dime non versee')+'</div><div style="font-size:0.68rem;color:#888">'+moisNom+'</div></div>';
+  loadPortalPres(m); loadPortalFin(m);
+  setTimeout(function(){loadPortalBooks();loadPortalCal();loadPortalDime(m);},150);
+  goPortalTab(0);
+}
+
+function goPortalTab(idx){
+  for(var i=0;i<5;i++){var pp=document.getElementById('pp'+i),pt=document.getElementById('ptab'+i);if(pp)pp.classList.remove('active');if(pt)pt.classList.remove('active');}
+  var p=document.getElementById('pp'+idx),t=document.getElementById('ptab'+idx);
+  if(p)p.classList.add('active'); if(t)t.classList.add('active');
+  if(idx===4) setTimeout(loadPortalCal,100);
+  if(idx===3) setTimeout(loadPortalBooks,100);
+  if(idx===2&&curMember) setTimeout(function(){loadPortalDime(curMember);},100);
+}
+
+function loadPortalPres(m){
+  var pres=[];
+  for(var i=0;i<db.attendance.length;i++) if(Number(db.attendance[i].muid)===Number(m.uid)) pres.push(db.attendance[i]);
+  pres.sort(function(a,b){return(b.date||'').localeCompare(a.date||'');});
+  var acts={};for(var i=0;i<pres.length;i++){var a=pres[i].act.split(' - ')[0];acts[a]=(acts[a]||0)+1;}
+  var sh='';for(var k in acts)sh+='<div class="sbox"><div class="snum" style="font-size:1.4rem">'+acts[k]+'</div><div class="slbl">'+k+'</div></div>';
+  document.getElementById('pprstats').innerHTML=sh||'<div class="empty">Aucune presence</div>';
+  var h='';for(var i=0;i<pres.length;i++)h+='<div class="litem"><div class="ltitle">'+pres[i].act+'</div><span style="font-size:0.73rem;color:#888">'+pres[i].date+'</span></div>';
+  document.getElementById('ppreslist').innerHTML=h||'<div class="empty">Aucune presence enregistree</div>';
+}
+
+function loadPortalFin(m){
+  var fins=[];
+  for(var i=0;i<db.finances.length;i++){
+    var f=db.finances[i];
+    if(f.type==='in'&&Number(f.muid)===Number(m.uid)) fins.push(f);
+  }
+  fins.sort(function(a,b){return(b.date||'').localeCompare(a.date||'');});
+  var tD=0,tO=0,nbD=0,nbO=0;
+  for(var i=0;i<fins.length;i++){
+    if(fins[i].ft==='Dime'){tD+=Number(fins[i].amount||0);nbD++;}
+    if(fins[i].ft==='Offrande'){tO+=Number(fins[i].amount||0);nbO++;}
+  }
+  document.getElementById('pfinstats').innerHTML=
+    '<div class="sbox" style="border-top-color:#16a34a"><div class="snum" style="color:#16a34a">'+nbD+'</div><div class="slbl">Dimes versees</div></div>'
+   +'<div class="sbox" style="border-top-color:#16a34a"><div class="snum" style="color:#16a34a">'+tD.toLocaleString()+'</div><div class="slbl">Total Dimes FCFA</div></div>'
+   +(nbO?'<div class="sbox" style="border-top-color:#8b5cf6"><div class="snum" style="color:#8b5cf6">'+tO.toLocaleString()+'</div><div class="slbl">Offrandes FCFA</div></div>':'');
+  var h='';
+  for(var i=0;i<fins.length;i++){
+    var f=fins[i];
+    h+='<div class="litem"><div><div class="ltitle">'+f.ft+' — '+Number(f.amount||0).toLocaleString()+' FCFA</div><div class="lsub">'+(f.date||'')+'</div></div>'
+      +'<span style="font-weight:700;color:#16a34a">&#10003;</span></div>';
+  }
+  document.getElementById('pfinlist').innerHTML=h||'<div class="empty">Aucune contribution enregistree</div>';
+}
+
+function switchLibTab(tab){
+  document.getElementById('plibtab-livres').style.background=tab==='livres'?'#1e3a8a':'#f9fafb';
+  document.getElementById('plibtab-livres').style.color=tab==='livres'?'#fff':'#888';
+  document.getElementById('plibtab-docs').style.background=tab==='docs'?'#1e3a8a':'#f9fafb';
+  document.getElementById('plibtab-docs').style.color=tab==='docs'?'#fff':'#888';
+  document.getElementById('plib-livres').style.display=tab==='livres'?'':'none';
+  document.getElementById('plib-docs').style.display=tab==='docs'?'':'none';
+}
+
+function loadPortalBooks(){
+  var q=(document.getElementById('pbsrch')?document.getElementById('pbsrch').value:'').toLowerCase();
+  var ac={'Disponible':'#16a34a','Emprunte':'#ca8a04','En commande':'#888','Archive':'#dc2626'};
+  // LIVRES
+  var h='';
+  for(var i=0;i<db.books.length;i++){
+    var b=db.books[i];
+    if((b.title+' '+(b.author||'')).toLowerCase().indexOf(q)<0)continue;
+    var c2=ac[b.avail]||'#888';
+    h+='<div class="fbk">'+(b.cover?'<img src="'+b.cover+'" style="width:52px;height:70px;border-radius:6px;object-fit:cover;flex-shrink:0">':'<div class="bkcv">&#128213;</div>')
+      +'<div style="flex:1;min-width:0"><div style="font-weight:600;font-size:0.88rem">'+b.title+'</div>'
+      +(b.author?'<div style="font-size:0.75rem;color:#888;margin-top:0.15rem">'+b.author+'</div>':'')
+      +'<div style="font-size:0.72rem;color:#1e3a8a;margin-top:0.15rem">'+b.cat+'</div>'
+      +'<div style="font-size:0.72rem;font-weight:600;color:'+c2+';margin-top:0.25rem">'+b.avail+'</div>'
+      +(b.desc?'<div style="font-size:0.74rem;color:#888;margin-top:0.3rem;line-height:1.4">'+b.desc+'</div>':'')
+      +'</div></div>';
+  }
+  var bl=document.getElementById('pbooklist');
+  if(bl)bl.innerHTML=h||'<div class="empty">Aucun livre disponible</div>';
+  // DOCUMENTS
+  var dh='';
+  if(db.docs&&db.docs.length){
+    for(var i=0;i<db.docs.length;i++){
+      var d=db.docs[i];
+      dh+='<div style="display:flex;align-items:center;gap:0.8rem;padding:0.7rem;background:#f9fafb;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:0.4rem">'
+        +'<div style="font-size:1.5rem">&#128196;</div>'
+        +'<div style="flex:1"><div style="font-weight:600;font-size:0.85rem">'+d.title+'</div>'
+        +'<div style="font-size:0.72rem;color:#888">'+d.cat+' — '+d.date+'</div></div>'
+        +(d.data?'<a href="'+d.data+'" download="'+d.name+'" style="background:#1e3a8a;color:#fff;border-radius:6px;padding:0.3rem 0.6rem;font-size:0.72rem;text-decoration:none">Telecharger</a>':'')
+        +'</div>';
+    }
+  }
+  var dl=document.getElementById('pdoclist');
+  if(dl)dl.innerHTML=dh||'<div class="empty">Aucun document disponible</div>';
+}
+
+function loadPortalCal(){
+  // Evenements a venir
+  var today=new Date().toISOString().split('T')[0],future=[];
+  for(var i=0;i<db.events.length;i++)if(!db.events[i].date||db.events[i].date>=today)future.push(db.events[i]);
+  future.sort(function(a,b){return(a.date||'').localeCompare(b.date||'');});
+  var h='';
+  for(var i=0;i<future.length;i++){var e=future[i];
+    h+='<div class="evitem"><div><div style="font-weight:500;font-size:0.88rem">'+e.title+'</div>'
+      +(e.desc?'<div style="font-size:0.74rem;color:#888">'+e.desc+'</div>':'')+'</div>'
+      +(e.date?'<span style="font-size:0.74rem;color:#888;white-space:nowrap">'+e.date+'</span>':'')+'</div>';
+  }
+  var pevlist=document.getElementById('pevlist');
+  if(pevlist)pevlist.innerHTML=h||'<div class="empty">Aucun evenement a venir</div>';
+  // Programme hebdomadaire personnalise
+  var acts=getActivites();
+  var pActEl=document.getElementById('pActivitesList');
+  if(pActEl){
+    if(!acts.length){pActEl.innerHTML='<div class="empty">Aucune activite definie</div>';return;}
+    pActEl.innerHTML=acts.map(function(a){
+      return '<div class="evitem" style="background:#eff6ff;border-radius:8px;padding:0.6rem 0.8rem;margin-bottom:0.4rem">'
+        +'<div><div style="font-weight:600">'+a.jour+'</div>'+(a.nom?'<div style="font-size:0.75rem;color:#888">'+a.nom+'</div>':'')+'</div>'
+        +(a.heure?'<span style="font-size:0.8rem;color:#1e3a8a;font-weight:600">'+a.heure+'</span>':'')+'</div>';
+    }).join('');
+  }
+}
+
+// ── INIT & EVENTS ──
+loadDB();
+document.getElementById('attdate').value=new Date().toISOString().split('T')[0];
+var _fdd=document.getElementById('fdimdate');if(_fdd)_fdd.value=new Date().toISOString().split('T')[0];
+var _odd=document.getElementById('offDate');if(_odd)_odd.value=new Date().toISOString().split('T')[0];
+renderDocs();
+
+// ── MULTI-ADMIN & HISTORY ──
+function getAdmins(){
+  try{var a=localStorage.getItem('ciga_admins');return a?JSON.parse(a):[
+    {user:'admin',pass:'ciga2024',role:'Admin Principal'},
+    {user:'admin2',pass:'ciga2024',role:'Secretaire'},
+    {user:'admin3',pass:'ciga2024',role:'Tresorier'}
+  ];}catch(e){return [{user:'admin',pass:'ciga2024',role:'Admin Principal'}];}
+}
+function saveAdmins(arr){try{localStorage.setItem('ciga_admins',JSON.stringify(arr));}catch(e){}}
+
+function getLoginHistory(){try{var h=localStorage.getItem('ciga_history');return h?JSON.parse(h):[];}catch(e){return [];}}
+function addLoginHistory(who,role){
+  var h=getLoginHistory();
+  var now=new Date();
+  var dt=now.toLocaleDateString('fr-FR')+' '+now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  h.unshift({who:who,role:role,dt:dt});
+  if(h.length>50)h=h.slice(0,50);
+  try{localStorage.setItem('ciga_history',JSON.stringify(h));}catch(e){}
+}
+function renderLoginHistory(){
+  var el=document.getElementById('loginHistoryList');
+  if(!el)return;
+  var h=getLoginHistory();
+  if(!h.length){el.innerHTML='<div class="empty">Aucune connexion enregistree</div>';return;}
+  var html='';
+  for(var i=0;i<h.length;i++){
+    var isMember=h[i].role==='Membre';
+    html+='<div class="log-item"><div><div class="log-who">'+h[i].who+'</div><div class="log-time">'+h[i].dt+'</div></div>'
+      +'<span class="log-role '+(isMember?'log-member':'log-admin')+'">'+h[i].role+'</span></div>';
+  }
+  el.innerHTML=html;
+}
+function renderAdminList(){
+  var el=document.getElementById('adminList');if(!el)return;
+  var admins=getAdmins();
+  var h='';
+  for(var i=0;i<admins.length;i++){
+    var a=admins[i];
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0.8rem;background:#f9fafb;border:1px solid #e2e8f0;border-radius:7px;margin-bottom:0.35rem">'
+      +'<div><div style="font-weight:600;font-size:0.85rem">'+a.user+'</div><div style="font-size:0.72rem;color:#1e3a8a">'+a.role+'</div></div>'
+      +(i>0?'<button class="btn bred bsm" data-act="deladmin" data-idx="'+i+'">Supprimer</button>':'<span style="font-size:0.7rem;color:#888">Principal</span>')
+      +'</div>';
+  }
+  el.innerHTML=h||'<div class="empty">Aucun administrateur</div>';
+}
+
+function switchLoginTab(tab){
+  document.getElementById('ltab-admin').classList.toggle('active',tab==='admin');
+  document.getElementById('ltab-member').classList.toggle('active',tab==='member');
+  document.getElementById('login-admin-form').style.display=tab==='admin'?'':'none';
+  document.getElementById('login-member-form').style.display=tab==='member'?'':'none';
+}
+
+function doAdminLogin(){
+  var u=document.getElementById('iuser').value.trim();
+  var p=document.getElementById('ipass').value;
+  var err=document.getElementById('lerr');
+  var admins=getAdmins();
+  var found=null;
+  for(var i=0;i<admins.length;i++){if(admins[i].user===u&&admins[i].pass===p){found=admins[i];break;}}
+  if(found){
+    addLoginHistory(found.user+' ('+found.role+')',found.role);
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app-header').classList.remove('hide');
+    document.getElementById('app-nav').classList.remove('hide');
+    document.getElementById('app-content').classList.remove('hide');
+    applyConfig(); goPage(0); toast('Bienvenue '+found.user+' !');
+    err.style.display='none';
+  } else { err.style.display='block'; }
+}
+
+function doMemberLogin(){
+  var id=document.getElementById('mlogin-id').value.trim().toUpperCase();
+  var pass=document.getElementById('mlogin-pass').value.trim();
+  var err=document.getElementById('lerr-member');
+  var found=null;
+  for(var i=0;i<db.members.length;i++){
+    var m=db.members[i];
+    if(m.id.toUpperCase()===id && m.pin===pass){found=m;break;}
+  }
+  if(found){
+    if(found.suspended){err.style.display='block';err.textContent='Votre compte est suspendu. Contactez votre pasteur.';return;}
+    addLoginHistory(found.nom+' '+found.prenom+' ('+found.id+')','Membre');
+    curMember=found;
+    document.getElementById('login-screen').style.display='none';
+    openMemberPortalDirect(found);
+    err.style.display='none';
+  } else { err.style.display='block'; }
+}
+
+function openMemberPortalDirect(m){
+  document.getElementById('mportal').classList.add('open');
+  loadPortal(m);
+}
+
+document.getElementById('loginbtn').addEventListener('click', doAdminLogin);
+document.getElementById('ipass').addEventListener('keydown',function(e){if(e.key==='Enter')doAdminLogin();});
+document.getElementById('loginbtn-member').addEventListener('click', doMemberLogin);
+document.getElementById('mlogin-pass').addEventListener('keydown',function(e){if(e.key==='Enter')doMemberLogin();});
+
+document.getElementById('btnlogout').addEventListener('click',function(){
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('app-header').classList.add('hide');
+  document.getElementById('app-nav').classList.add('hide');
+  document.getElementById('app-content').classList.add('hide');
+  document.getElementById('iuser').value='';
+  document.getElementById('ipass').value='';
+  document.getElementById('lerr').style.display='none';
+  switchLoginTab('admin');
+});
+
+// Close member portal goes back to login if came from member login
+var origClosePortal2=closePortal;
+document.getElementById('btncloseportal').addEventListener('click',function(){
+  document.getElementById('mportal').classList.remove('open');
+  // If no admin interface is shown, go back to login
+  if(document.getElementById('app-header').classList.contains('hide')){
+    document.getElementById('login-screen').style.display='flex';
+    switchLoginTab('member');
+  }
+});
+
+document.getElementById('btnAddAdmin').addEventListener('click',function(){
+  var u=document.getElementById('newAdminUser').value.trim();
+  var p=document.getElementById('newAdminPass').value.trim();
+  var r=document.getElementById('newAdminRole').value;
+  if(!u||!p){toast('Remplissez tous les champs');return;}
+  var admins=getAdmins();
+  if(admins.length>=3){toast('Maximum 3 administrateurs');return;}
+  for(var i=0;i<admins.length;i++){if(admins[i].user===u){toast('Ce nom existe deja');return;}}
+  admins.push({user:u,pass:p,role:r});saveAdmins(admins);renderAdminList();
+  document.getElementById('newAdminUser').value='';document.getElementById('newAdminPass').value='';
+  toast('Administrateur ajoute ✓');
+});
+
+document.addEventListener('click',function(e){
+  if(e.target.getAttribute('data-act')==='deladmin'){
+    var idx=parseInt(e.target.getAttribute('data-idx'));
+    var admins=getAdmins();admins.splice(idx,1);saveAdmins(admins);renderAdminList();toast('Supprime');
+  }
+});
+
+// Render admin list and history when config page opens
+document.addEventListener('click',function(e){
+  if(e.target.id==='btnClearHistory'){
+    if(confirm('Supprimer tout l\'historique?')){
+      localStorage.removeItem('ciga_history');
+      renderLoginHistory();toast('Historique supprime');
+    }
+  }
+});
+
+// ── ACTIVITES PERSONNALISEES ──
+function getActivites(){
+  try{var a=localStorage.getItem('ciga_activites');return a?JSON.parse(a):[
+    {jour:'Dimanche',heure:'9h00',nom:'Culte dominical'},
+    {jour:'Mardi',heure:'18h00',nom:'Culte d enseignement'},
+    {jour:'Mercredi',heure:'18h00',nom:'Culte de priere'},
+    {jour:'Vendredi',heure:'18h00',nom:'Intercession'},
+    {jour:'Samedi',heure:'8h00',nom:'Evangelisation'}
+  ];}catch(e){return [];}
+}
+function saveActivites(arr){try{localStorage.setItem('ciga_activites',JSON.stringify(arr));}catch(e){}}
+function renderActivitesList(){
+  var el=document.getElementById('activitesList');if(!el)return;
+  var arr=getActivites();
+  if(!arr.length){el.innerHTML='<div class="empty">Aucune activite</div>';return;}
+  el.innerHTML=arr.map(function(a,i){
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.5rem 0.8rem;background:#f9fafb;border:1px solid #e2e8f0;border-radius:7px;margin-bottom:0.3rem">'
+      +'<div><strong style="font-size:0.85rem">'+a.jour+'</strong> <span style="color:#888;font-size:0.78rem">'+a.heure+'</span> — <span style="font-size:0.83rem">'+a.nom+'</span></div>'
+      +'<button data-actidx="'+i+'" data-act="delact" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:1rem">&#x2715;</button>'
+      +'</div>';
+  }).join('');
+}
+document.getElementById('btnAddActivite').addEventListener('click',function(){
+  var jour=document.getElementById('newActJour').value.trim();
+  var heure=document.getElementById('newActHeure').value.trim();
+  var nom=document.getElementById('newActNom').value.trim();
+  if(!jour||!nom){toast('Remplissez le jour et l activite');return;}
+  var arr=getActivites();
+  arr.push({jour:jour,heure:heure||'',nom:nom});
+  saveActivites(arr);renderActivitesList();
+  document.getElementById('newActJour').value='';
+  document.getElementById('newActHeure').value='';
+  document.getElementById('newActNom').value='';
+  toast('Activite ajoutee');
+});
+document.addEventListener('click',function(e){
+  if(e.target.getAttribute('data-act')==='delact'){
+    var idx=parseInt(e.target.getAttribute('data-actidx'));
+    var arr=getActivites();arr.splice(idx,1);saveActivites(arr);renderActivitesList();
+  }
+});
+
+// ── DIME STATUS COULEUR dans espace membre ──
+function loadPortalDime(m){
+  var el=document.getElementById('pdimeStatus');if(!el)return;
+  var now=new Date();
+  var moisNoms=['Janvier','Fevrier','Mars','Avril','Mai','Juin','Juillet','Aout','Septembre','Octobre','Novembre','Decembre'];
+  var h='';
+  // Show last 6 months
+  for(var i=0;i<6;i++){
+    var d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    var ym=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+    var moisNom=moisNoms[d.getMonth()]+' '+d.getFullYear();
+    var paid=db.finances.some(function(f){return f.ft==='Dime'&&f.type==='in'&&Number(f.muid)===Number(m.uid)&&(f.date||'').indexOf(ym)===0;});
+    var isCurrentMonth=i===0;
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:0.8rem 1rem;background:'+(paid?'#f0fdf4':'#fef2f2')+';border:2px solid '+(paid?'#16a34a':'#dc2626')+';border-radius:10px;margin-bottom:0.6rem">'
+      +'<div>'
+      +'<div style="font-weight:700;font-size:0.9rem;color:'+(paid?'#16a34a':'#dc2626')+'">'+moisNom+'</div>'
+      +(isCurrentMonth?'<div style="font-size:0.72rem;color:#888">Mois en cours</div>':'')
+      +'</div>'
+      +'<div style="font-size:1.5rem">'+(paid?'&#9989;':'&#10060;')+'</div>'
+      +'</div>';
+  }
+  el.innerHTML=h||'<div class="empty">Aucune information</div>';
+}
+
+// ── CALENDRIER PORTAL avec activites perso ──
+// Override loadPortal to add dime status
+var _origLoadPortal=loadPortal;
+loadPortal=function(m){
+  _origLoadPortal(m);
+  setTimeout(function(){
+    loadPortalDime(m);
+    loadPortalCal();
+    loadPortalBooks();
+  },100);
+  window._curPortalMember=m;
+};
+
+// Render activites list when config opens
+var _origRenderCfg3=renderCfg;
+renderCfg=function(){
+  _origRenderCfg3();
+  renderActivitesList();
+};
+
+var _origRenderCfg2=renderCfg;
+renderCfg=function(){
+  _origRenderCfg2();
+  renderAdminList();
+  renderLoginHistory();
+  renderSuspendedList();
+};
+
+function renderSuspendedList(){
+  var el=document.getElementById('suspendedList');
+  if(!el)return;
+  var susp=db.members.filter(function(m){return m.suspended;});
+  if(!susp.length){el.innerHTML='<div class="empty">Aucun membre suspendu</div>';return;}
+  var h='';
+  for(var i=0;i<susp.length;i++){
+    var m=susp[i];
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0.8rem;background:#fff7ed;border:1px solid #fed7aa;border-radius:7px;margin-bottom:0.35rem">'
+      +'<div><div style="font-weight:600;font-size:0.85rem">'+m.nom+' '+m.prenom+'</div>'
+      +'<div style="font-size:0.72rem;color:#888">'+m.id+'</div></div>'
+      +'<button class="btn bgrn bsm" data-uid="'+m.uid+'" data-act="unsuspend">&#9989; Reactiver</button>'
+      +'</div>';
+  }
+  el.innerHTML=h;
+}
+document.getElementById('btnportal').addEventListener('click', openPortal);
+document.getElementById('btncloseportal').addEventListener('click', closePortal);
+document.getElementById('btnclosepinscr').addEventListener('click', closePinScr);
+document.getElementById('btncancelcfm').addEventListener('click', closeCfm);
+document.getElementById('btnokcfm').addEventListener('click',function(){if(cfmCB){cfmCB();closeCfm();}});
+document.getElementById('btncloseqr').addEventListener('click',function(){closeModal('qrmodal');});
+document.getElementById('btnadd').addEventListener('click', addMember);
+document.getElementById('btndelallmembers').addEventListener('click', delAllMembers);
+document.getElementById('btnadddoc').addEventListener('click', addDoc);
+document.getElementById('btnattpres').addEventListener('click', addAtt);
+document.getElementById('btnaddin').addEventListener('click',function(){addFin('in');});
+document.getElementById('btnaddout').addEventListener('click',function(){addFin('out');});
+document.getElementById('btnaddcom').addEventListener('click', addCom);
+document.getElementById('btnaddev').addEventListener('click', addEv);
+document.getElementById('btnaddbook').addEventListener('click', addBook);
+document.getElementById('btnsavecfg').addEventListener('click', saveCfg);
+document.getElementById('btnsavedash').addEventListener('click', saveDashConfig);
+document.getElementById('btnchgpass').addEventListener('click', chgPass);
+document.getElementById('msrch').addEventListener('input', renderMembers);
+document.getElementById('attsrch').addEventListener('input', renderAtt);
+document.getElementById('bsrch').addEventListener('input', renderBooks);
+document.getElementById('bfcat').addEventListener('change', renderBooks);
+document.getElementById('pbsrch').addEventListener('input', loadPortalBooks);
+document.getElementById('logofile').addEventListener('change',function(){if(!this.files[0])return;var r=new FileReader();r.onload=function(e){db.logo=e.target.result;saveDB();applyConfig();toast('Logo mis a jour');};r.readAsDataURL(this.files[0]);});
+document.getElementById('hlogo').addEventListener('click',function(){document.getElementById('logofile').click();});
+document.getElementById('cfglogo').addEventListener('change',function(){if(!this.files[0])return;var r=new FileReader();r.onload=function(e){db.logo=e.target.result;document.getElementById('cfglogoprev').innerHTML='<img src="'+e.target.result+'" style="width:55px;height:55px;border-radius:50%;object-fit:cover;border:2px solid #1e3a8a">';};r.readAsDataURL(this.files[0]);});
+
+for(var ni=0;ni<8;ni++){
+  (function(idx){document.getElementById('nav'+idx).addEventListener('click',function(){goPage(idx);});})(ni);
+}
+
+var ptabids=['ptab0','ptab1','ptab2','ptab3','ptab4'];
+for(var pi=0;pi<ptabids.length;pi++){
+  (function(idx){document.getElementById(ptabids[idx]).addEventListener('click',function(){goPortalTab(idx);});})(pi);
+}
+
+var pinkeys=['pk1','pk2','pk3','pk4','pk5','pk6','pk7','pk8','pk9','pk0'];
+var pinvals=['1','2','3','4','5','6','7','8','9','0'];
+for(var ki=0;ki<pinkeys.length;ki++){
+  (function(val){document.getElementById('pk'+val).addEventListener('click',function(){pinPress(val);});})(pinvals[ki]);
+}
+document.getElementById('pkcl').addEventListener('click', pinClr);
+document.getElementById('pkdel').addEventListener('click', pinDel);
+
+document.addEventListener('click',function(e){
+  var t=e.target;
+  var act=t.getAttribute('data-act');
+  var id=t.getAttribute('data-id');
+  var uid=parseInt(t.getAttribute('data-uid'));
+  if(act==='qr') showQR(uid);
+  if(act==='print') printCard(uid);
+  if(act==='del') delMember(uid);
+  if(act==='edit') openEditMember(uid);
+  if(act==='suspend'){
+    confirmDlg('Suspendre ce membre ?','Cette personne ne pourra plus se connecter.',function(){
+      for(var i=0;i<db.members.length;i++) if(db.members[i].uid===uid){db.members[i].suspended=true;break;}
+      saveDB(); renderMembers(); toast('Membre suspendu');
+    });
+  }
+  if(act==='unsuspend'){
+    for(var i=0;i<db.members.length;i++) if(db.members[i].uid===uid){db.members[i].suspended=false;break;}
+    saveDB(); renderMembers(); toast('Membre reactivé ✓');
+  }
+  if(act==='delatt') delAtt(parseInt(id));
+  if(act==='delfin') delFin(parseInt(id));
+  if(act==='delcom') delCom(parseInt(id));
+  if(act==='delev') delEv(parseInt(id));
+  if(act==='delbook') delBook(parseInt(id));
+  if(act==='deldoc') delDoc(parseInt(id));
+  if(act==='bookavail') updBookAvail(parseInt(id), t.value);
+});
+
+document.getElementById('nav8').addEventListener('click',function(){goPage(8);});
+
+// ── SUSPENSION ──
+function renderSuspension(){
+  // Remplir select membres non suspendus
+  var sel=document.getElementById('suspMember');
+  sel.innerHTML='<option value="">-- Selectionner un membre --</option>';
+  for(var i=0;i<db.members.length;i++){
+    if(!db.members[i].suspended) sel.innerHTML+='<option value="'+db.members[i].uid+'">'+db.members[i].nom+' '+db.members[i].prenom+'</option>';
+  }
+  // Liste membres suspendus
+  var susp=db.members.filter(function(m){return m.suspended;});
+  var el=document.getElementById('suspListPage');
+  if(!susp.length){el.innerHTML='<div class="empty">Aucun membre suspendu</div>';}
+  else{
+    var h='';
+    for(var i=0;i<susp.length;i++){
+      var m=susp[i];
+      h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:0.7rem 0.8rem;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;margin-bottom:0.5rem">'
+        +'<div>'
+        +'<div style="font-weight:700;font-size:0.88rem">'+m.nom+' '+m.prenom+'</div>'
+        +'<div style="font-size:0.72rem;color:#1e3a8a">'+m.id+'</div>'
+        +(m.suspRaison?'<div style="font-size:0.72rem;color:#f59e0b;margin-top:0.15rem">&#9940; '+m.suspRaison+'</div>':'')
+        +(m.suspComment?'<div style="font-size:0.7rem;color:#888">'+m.suspComment+'</div>':'')
+        +'</div>'
+        +'<button class="btn bgrn bsm" data-uid="'+m.uid+'" data-act="unsuspend">&#9989; Reactiver</button>'
+        +'</div>';
+    }
+    el.innerHTML=h;
+  }
+  // Liste membres actifs
+  var actifs=db.members.filter(function(m){return !m.suspended;});
+  var el2=document.getElementById('activeMembersList');
+  if(!actifs.length){el2.innerHTML='<div class="empty">Aucun membre actif</div>';}
+  else{
+    var h2='';
+    for(var i=0;i<actifs.length;i++){
+      var m=actifs[i];
+      h2+='<div style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0.8rem;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;margin-bottom:0.4rem">'
+        +'<div>'
+        +'<div style="font-weight:600;font-size:0.85rem">'+m.nom+' '+m.prenom+'</div>'
+        +'<div style="font-size:0.7rem;color:#888">'+m.id+(m.fonction?' &bull; '+m.fonction:'')+'</div>'
+        +'</div>'
+        +'<span style="font-size:0.7rem;color:#16a34a;font-weight:600">&#9989; Actif</span>'
+        +'</div>';
+    }
+    el2.innerHTML=h2;
+  }
+}
+
+document.getElementById('btnSuspendMember').addEventListener('click',function(){
+  var uid=parseInt(document.getElementById('suspMember').value);
+  if(!uid){toast('Selectionnez un membre');return;}
+  var raison=document.getElementById('suspRaison').value;
+  var comment=document.getElementById('suspComment').value.trim();
+  for(var i=0;i<db.members.length;i++){
+    if(db.members[i].uid===uid){
+      db.members[i].suspended=true;
+      db.members[i].suspRaison=raison;
+      db.members[i].suspComment=comment;
+      db.members[i].suspDate=new Date().toLocaleDateString('fr-FR');
+      break;
+    }
+  }
+  saveDB(); renderSuspension(); renderMembers();
+  document.getElementById('suspMember').value='';
+  document.getElementById('suspComment').value='';
+  toast('Membre suspendu ✓');
+});
+document.getElementById('cfmdlg').addEventListener('click',function(e){if(e.target===this)closeCfm();});
+
+// ── ONGLETS FINANCES ──
+document.addEventListener('click',function(e){
+  if(e.target.getAttribute('data-ftab')!==null){
+    var idx=e.target.getAttribute('data-ftab');
+    document.querySelectorAll('.fin-tab').forEach(function(b){b.style.background='#f9fafb';b.style.color='#888';});
+    e.target.style.background='#1e3a8a'; e.target.style.color='#fff';
+    ['ftab0','ftab1','ftab2'].forEach(function(id){var el=document.getElementById(id);if(el)el.style.display='none';});
+    var el=document.getElementById('ftab'+idx);
+    if(el){el.style.display='';if(idx==='1')renderOffCalendar();}
+  }
+});
+
+// ── OFFRANDES CALENDRIER ──
+if(!db.offrandes) db.offrandes=[];
+var offYear=new Date().getFullYear(), offMonth=new Date().getMonth();
+
+function renderOffCalendar(){
+  if(!db.offrandes) db.offrandes=[];
+  var firstDay=new Date(offYear,offMonth,1).getDay();
+  var daysInMonth=new Date(offYear,offMonth+1,0).getDate();
+  var ym=offYear+'-'+String(offMonth+1).padStart(2,'0');
+  document.getElementById('offCalTitle').textContent=MOIS[offMonth]+' '+offYear;
+  // Collecter offrandes du mois
+  var offDates={};
+  var total=0;
+  for(var i=0;i<db.offrandes.length;i++){
+    var o=db.offrandes[i];
+    if((o.date||'').indexOf(ym)!==0) continue;
+    offDates[o.date]=(offDates[o.date]||0)+o.montant;
+    total+=o.montant;
+  }
+  var jours=['D','L','M','M','J','V','S'];
+  var h='';
+  for(var j=0;j<7;j++) h+='<div class="cal-day-lbl">'+jours[j]+'</div>';
+  for(var b=0;b<firstDay;b++) h+='<div class="cal-day other-month"></div>';
+  var today=new Date().toISOString().split('T')[0];
+  for(var d=1;d<=daysInMonth;d++){
+    var ds=offYear+'-'+String(offMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    var hasOff=offDates[ds]>0;
+    var isToday=ds===today;
+    var isSun=new Date(ds).getDay()===0;
+    var cls='cal-day'+(hasOff?' has-pres':'')+(isToday?' today':'');
+    var style=isSun&&!hasOff?'color:#8b5cf6;font-weight:700':'';
+    h+='<div class="'+cls+'" data-offdate="'+ds+'" style="'+(hasOff?'background:#8b5cf6;color:#fff;':style)+';cursor:'+(hasOff?'pointer':'default')+'">'+d
+      +(hasOff?'<div style="font-size:0.5rem;margin-top:1px">'+(offDates[ds]/1000).toFixed(0)+'k</div>':'')
+      +'</div>';
+  }
+  document.getElementById('offCalGrid').innerHTML=h;
+  // Total
+  var el=document.getElementById('offTotal');
+  if(el) el.textContent='Total : '+total.toLocaleString()+' FCFA';
+  // Liste
+  renderOffList(ym);
+}
+
+function renderOffList(ym){
+  var el=document.getElementById('offList');
+  if(!el)return;
+  var list=[];
+  for(var i=0;i<db.offrandes.length;i++) if((db.offrandes[i].date||'').indexOf(ym)===0) list.push(db.offrandes[i]);
+  list.sort(function(a,b){return b.date.localeCompare(a.date);});
+  if(!list.length){el.innerHTML='<div class="empty">Aucune offrande ce mois</div>';return;}
+  var h='';
+  for(var i=0;i<list.length;i++){
+    var o=list[i];
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0.8rem;background:#faf5ff;border:1px solid #e9d5ff;border-radius:8px;margin-bottom:0.4rem">'
+      +'<div><div style="font-weight:600;font-size:0.85rem">'+o.date+'</div>'
+      +(o.note?'<div style="font-size:0.72rem;color:#888">'+o.note+'</div>':'')+'</div>'
+      +'<div style="display:flex;align-items:center;gap:0.5rem">'
+      +'<span style="font-weight:700;color:#8b5cf6">'+o.montant.toLocaleString()+' FCFA</span>'
+      +'<button data-oid="'+o.id+'" data-act="deloff" style="background:none;border:none;color:#dc2626;cursor:pointer;font-size:0.9rem">&#x2715;</button>'
+      +'</div></div>';
+  }
+  el.innerHTML=h;
+}
+
+document.addEventListener('click',function(e){
+  // Clic sur jour du calendrier offrandes
+  var offdate=e.target.getAttribute('data-offdate');
+  if(offdate){
+    var offs=db.offrandes.filter(function(o){return o.date===offdate;});
+    var el=document.getElementById('offDayDetail');
+    if(!el)return;
+    if(!offs.length){el.innerHTML='';return;}
+    var h='<div style="background:#faf5ff;border-radius:8px;padding:0.8rem"><div style="font-weight:700;font-size:0.82rem;color:#8b5cf6;margin-bottom:0.4rem">'+offdate+'</div>';
+    var tot=0;
+    for(var i=0;i<offs.length;i++){h+='<div style="font-size:0.78rem">'+offs[i].montant.toLocaleString()+' FCFA'+(offs[i].note?' — '+offs[i].note:'')+'</div>';tot+=offs[i].montant;}
+    h+='<div style="font-weight:700;margin-top:0.4rem;color:#8b5cf6">Total : '+tot.toLocaleString()+' FCFA</div></div>';
+    el.innerHTML=h;
+  }
+  // Supprimer offrande
+  if(e.target.getAttribute('data-act')==='deloff'){
+    var oid=parseInt(e.target.getAttribute('data-oid'));
+    db.offrandes=db.offrandes.filter(function(o){return o.id!==oid;});
+    saveDB(); renderOffCalendar(); toast('Offrande supprimee');
+  }
+});
+
+document.getElementById('offCalPrev').addEventListener('click',function(){offMonth--;if(offMonth<0){offMonth=11;offYear--;}renderOffCalendar();});
+document.getElementById('offCalNext').addEventListener('click',function(){offMonth++;if(offMonth>11){offMonth=0;offYear++;}renderOffCalendar();});
+
+// Définir date par défaut = prochain dimanche ou aujourd'hui
+(function(){
+  var d=new Date(); var day=d.getDay();
+  if(day!==0){var diff=7-day;d.setDate(d.getDate()-(day===0?0:day));}
+  var inp=document.getElementById('offDate');
+  if(inp) inp.value=new Date().toISOString().split('T')[0];
+})();
+
+document.getElementById('btnAddOff').addEventListener('click',function(){
+  var date=document.getElementById('offDate').value;
+  var montant=parseInt(document.getElementById('offMontant').value||'0');
+  var note=document.getElementById('offNote').value.trim();
+  var memSel=document.getElementById('offMembre');
+  var muid=memSel?parseInt(memSel.value)||0:0;
+  var mname='';
+  if(muid){for(var i=0;i<db.members.length;i++)if(db.members[i].uid===muid){mname=db.members[i].nom+' '+db.members[i].prenom;break;}}
+  if(!date){toast('Selectionnez une date');return;}
+  if(!montant||montant<=0){toast('Entrez un montant valide');return;}
+  if(!db.offrandes)db.offrandes=[];
+  db.offrandes.push({id:Date.now(),date:date,montant:montant,note:note,muid:muid,mname:mname});
+  if(muid&&mname){
+    db.finances.push({id:Date.now()+1,type:'in',ft:'Offrande',muid:muid,mname:mname,amount:montant,date:date,note:note});
+  }
+  saveDB();renderOffCalendar();renderFin();
+  document.getElementById('offMontant').value='';
+  document.getElementById('offNote').value='';
+  if(memSel)memSel.value='';
+  toast('Offrande enregistree');
+});
+function renderDimeList(){
+  var el=document.getElementById('dimeCheckList');
+  if(!el)return;
+  var now=new Date();
+  var ym=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+  var moisNom=MOIS[now.getMonth()]+' '+now.getFullYear();
+  if(!db.members.length){el.innerHTML='<div class="empty">Aucun membre enregistre</div>';return;}
+  var h='<div style="font-size:0.78rem;font-weight:600;color:#888;margin-bottom:0.5rem">Mois : '+moisNom+'</div>';
+  for(var i=0;i<db.members.length;i++){
+    var m=db.members[i];
+    if(m.suspended) continue;
+    // Verifier si dime deja enregistree ce mois
+    var dimePaye=false;
+    for(var j=0;j<db.finances.length;j++){
+      var f=db.finances[j];
+      if(f.muid===m.uid && f.ft==='Dime' && f.type==='in' && (f.date||'').indexOf(ym)===0){dimePaye=true;break;}
+    }
+    h+='<div style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0.8rem;background:'+(dimePaye?'#f0fdf4':'#fef2f2')+';border:1px solid '+(dimePaye?'#bbf7d0':'#fecaca')+';border-radius:8px;margin-bottom:0.4rem">'
+      +'<div><div style="font-weight:600;font-size:0.83rem">'+m.nom+' '+m.prenom+'</div>'
+      +'<div style="font-size:0.7rem;color:#888">'+m.id+'</div></div>'
+      +'<div style="display:flex;gap:0.4rem">'
+      +(dimePaye
+        ?'<span style="background:#16a34a;color:#fff;font-size:0.75rem;font-weight:700;padding:0.25rem 0.7rem;border-radius:99px">✓ OUI</span>'
+          +'<button data-muid="'+m.uid+'" data-act="undime" style="background:#fee2e2;border:none;color:#dc2626;font-size:0.72rem;padding:0.25rem 0.5rem;border-radius:6px;cursor:pointer">Annuler</button>'
+        :'<button data-muid="'+m.uid+'" data-act="dimeOui" style="background:#16a34a;border:none;color:#fff;font-size:0.75rem;font-weight:700;padding:0.3rem 0.8rem;border-radius:99px;cursor:pointer">OUI</button>'
+          +'<button data-muid="'+m.uid+'" data-act="dimeNon" style="background:#fee2e2;border:1px solid #fecaca;color:#dc2626;font-size:0.75rem;font-weight:700;padding:0.3rem 0.8rem;border-radius:99px;cursor:pointer">NON</button>'
+      )
+      +'</div></div>';
+  }
+  el.innerHTML=h;
+}
+
+document.addEventListener('click',function(e){
+  var act=e.target.getAttribute('data-act');
+  var muid=parseInt(e.target.getAttribute('data-muid'));
+  if(act==='dimeOui'){
+    var m=null; for(var i=0;i<db.members.length;i++) if(db.members[i].uid===muid){m=db.members[i];break;}
+    if(!m)return;
+    var now=new Date();
+    db.finances.push({uid:Date.now(),muid:muid,mname:m.nom+' '+m.prenom,type:'in',ft:'Dime',amount:0,date:now.toISOString().split('T')[0],note:'Dime confirmee'});
+    saveDB(); renderDimeList(); renderFin(); toast('Dime de '+m.nom+' enregistree ✓');
+  }
+  if(act==='dimeNon'){
+    var m=null; for(var i=0;i<db.members.length;i++) if(db.members[i].uid===muid){m=db.members[i];break;}
+    if(m) toast(m.nom+' — Dime non versee ce mois');
+  }
+  if(act==='undime'){
+    var now=new Date();
+    var ym=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+    db.finances=db.finances.filter(function(f){return !(f.muid===muid&&f.ft==='Dime'&&f.type==='in'&&(f.date||'').indexOf(ym)===0);});
+    saveDB(); renderDimeList(); renderFin(); toast('Dime annulee');
+  }
+});
+var editUid=null;
+function openEditMember(uid){
+  var m=null; for(var i=0;i<db.members.length;i++) if(db.members[i].uid===uid){m=db.members[i];break;}
+  if(!m){toast('Membre introuvable');return;}
+  editUid=uid;
+  document.getElementById('enom').value=m.nom||'';
+  document.getElementById('eprenom').value=m.prenom||'';
+  document.getElementById('etel').value=m.tel||'';
+  document.getElementById('enaiss').value=m.naiss||'';
+  document.getElementById('elieu').value=m.lieu||'';
+  document.getElementById('eadr').value=m.adr||'';
+  document.getElementById('epin').value=m.pin||'';
+  // Fill fonction select
+  var arr=loadFonctions();
+  var sel=document.getElementById('efonction');
+  sel.innerHTML='<option value="">-- Selectionner --</option>';
+  for(var i=0;i<arr.length;i++) sel.innerHTML+='<option'+(arr[i]===(m.fonction||'')?' selected':'')+'>'+arr[i]+'</option>';
+  // Show current photo
+  var prev=document.getElementById('ephoto-prev');
+  prev.innerHTML=m.photo?'<img src="'+m.photo+'" style="width:60px;height:60px;border-radius:8px;object-fit:cover;border:2px solid #e2e8f0">':'';
+  document.getElementById('ephoto').value='';
+  document.getElementById('editmodal').style.display='flex';
+}
+document.getElementById('btnSaveEdit').addEventListener('click',function(){
+  if(!editUid)return;
+  var nom=document.getElementById('enom').value.trim();
+  var prenom=document.getElementById('eprenom').value.trim();
+  if(!nom||!prenom){toast('Nom et prenom requis');return;}
+  function doUpdate(photo){
+    for(var i=0;i<db.members.length;i++){
+      if(db.members[i].uid===editUid){
+        db.members[i].nom=nom;
+        db.members[i].prenom=prenom;
+        db.members[i].tel=document.getElementById('etel').value.trim();
+        db.members[i].naiss=document.getElementById('enaiss').value;
+        db.members[i].lieu=document.getElementById('elieu').value.trim();
+        db.members[i].adr=document.getElementById('eadr').value.trim();
+        db.members[i].fonction=document.getElementById('efonction').value;
+        db.members[i].pin=document.getElementById('epin').value.trim();
+        if(photo) db.members[i].photo=photo;
+        break;
+      }
+    }
+    saveDB(); renderMembers(); fillSelects();
+    document.getElementById('editmodal').style.display='none';
+    toast('Membre mis a jour ✓');
+  }
+  var pf=document.getElementById('ephoto').files[0];
+  if(pf){var r=new FileReader();r.onload=function(e){doUpdate(e.target.result);};r.readAsDataURL(pf);}
+  else doUpdate(null);
+});
+
+// ── FONCTIONS PERSONNALISABLES ──
+var DEFAULT_FONCTIONS = ['Pasteur','Pasteur Adjoint','Ancien','Diacre','Diaconesse','Evangeliste','Prophete',
+  'Responsable de departement','Responsable des jeunes','Responsable des femmes','Responsable des hommes',
+  'Responsable du culte','Musicien / Choriste','Secretaire','Tresorier','Protocole / Accueil',
+  'Technicien son / lumiere','Membre','Nouveau converti','Auditeur'];
+
+function loadFonctions() {
+  try { var f=localStorage.getItem('ciga_fonctions'); return f?JSON.parse(f):DEFAULT_FONCTIONS.slice(); } catch(e){return DEFAULT_FONCTIONS.slice();}
+}
+function saveFonctions(arr){try{localStorage.setItem('ciga_fonctions',JSON.stringify(arr));}catch(e){}}
+function fillFonctionSelect(){
+  var arr=loadFonctions();
+  var sel=document.getElementById('mfonction');
+  sel.innerHTML='<option value="">-- Selectionner une fonction --</option>';
+  for(var i=0;i<arr.length;i++) sel.innerHTML+='<option>'+arr[i]+'</option>';
+}
+function renderFonctionsList(){
+  var arr=loadFonctions();
+  var el=document.getElementById('fonctionsList');
+  if(!el)return;
+  var h='';
+  for(var i=0;i<arr.length;i++){
+    h+='<span style="display:inline-flex;align-items:center;gap:0.3rem;background:#eff6ff;border:1px solid #bfdbfe;border-radius:20px;padding:0.25rem 0.7rem;font-size:0.78rem;color:#1e3a8a">'
+      +arr[i]+'<button data-fidx="'+i+'" data-act="delfn" style="background:none;border:none;cursor:pointer;color:#dc2626;font-size:0.9rem;line-height:1;padding:0">&#x2715;</button></span>';
+  }
+  el.innerHTML=h||'<div class="empty">Aucune fonction definie</div>';
+}
+document.getElementById('btnAddFonction').addEventListener('click',function(){
+  var v=document.getElementById('newFonction').value.trim();
+  if(!v){toast('Entrez un nom de fonction');return;}
+  var arr=loadFonctions();
+  if(arr.indexOf(v)>=0){toast('Fonction deja existante');return;}
+  arr.push(v); saveFonctions(arr); fillFonctionSelect(); renderFonctionsList();
+  document.getElementById('newFonction').value=''; toast('Fonction ajoutee');
+});
+document.addEventListener('click',function(e){
+  if(e.target.getAttribute('data-act')==='delfn'){
+    var idx=parseInt(e.target.getAttribute('data-fidx'));
+    var arr=loadFonctions(); arr.splice(idx,1); saveFonctions(arr); fillFonctionSelect(); renderFonctionsList();
+  }
+});
+fillFonctionSelect();
+
+// ── PIN FINANCE ──
+function getFinPin(){return localStorage.getItem('ciga_finpin')||'1234';}
+function saveFinPin(p){localStorage.setItem('ciga_finpin',p);}
+var finPinVal='';
+function updFinPin(){var d='';for(var i=0;i<4;i++)d+=(i<finPinVal.length?'●':'_')+(i<3?' ':'');document.getElementById('fin-pin-dsp').textContent=d;}
+function checkFinPin(){
+  if(finPinVal===getFinPin()){
+    document.getElementById('fin-lock').classList.remove('open');
+    finPinVal=''; updFinPin();
+  } else {
+    document.getElementById('fin-pinerr').style.display='block';
+    finPinVal=''; updFinPin();
+  }
+}
+document.querySelectorAll('.fin-pinkey').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var k=this.getAttribute('data-fk');
+    if(k==='clr'){finPinVal='';document.getElementById('fin-pinerr').style.display='none';}
+    else if(k==='del'){finPinVal=finPinVal.slice(0,-1);}
+    else if(finPinVal.length<4){finPinVal+=k;}
+    updFinPin();
+    if(finPinVal.length===4)setTimeout(checkFinPin,150);
+  });
+});
+// Re-lock finance : gere directement dans goPage
+document.getElementById('btnChgFinPin').addEventListener('click',function(){
+  var p1=document.getElementById('fp1').value;
+  var p2=document.getElementById('fp2').value;
+  if(!p1||p1.length!==4||!/^\d+$/.test(p1)){toast('Le PIN doit etre 4 chiffres');return;}
+  if(p1!==p2){toast('Les PIN ne correspondent pas');return;}
+  saveFinPin(p1); document.getElementById('fp1').value=''; document.getElementById('fp2').value='';
+  toast('PIN Finance mis a jour ✓');
+});
+
+// ── EXPORT EXCEL ──
+function exportExcel(){
+  if(!db.members.length){toast('Aucun membre a exporter');return;}
+  var bom='\uFEFF';
+  var headers=['Nom','Prenom','ID','Telephone','Date Naissance','Lieu Naissance','Adresse','Fonction','PIN'];
+  var rows=[headers.join(';')];
+  for(var i=0;i<db.members.length;i++){
+    var m=db.members[i];
+    rows.push([m.nom,m.prenom,m.id,m.tel||'',m.naiss||'',m.lieu||'',m.adr||'',m.fonction||'',m.pin||''].join(';'));
+  }
+  var csv=bom+rows.join('\r\n');
+  var blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement('a'); a.href=url;
+  a.download='CIGA-Membres-'+new Date().toISOString().split('T')[0]+'.csv';
+  a.click(); URL.revokeObjectURL(url);
+  toast('Export Excel (CSV) telechargé ✓');
+}
+document.getElementById('btnExportExcel').addEventListener('click',exportExcel);
+
+// ── EXPORT PDF MEMBRES ──
+function exportPDF(){
+  if(!db.members.length){toast('Aucun membre a exporter');return;}
+  var w=window.open('','_blank');
+  if(!w){toast('Autorisez les popups');return;}
+  var rows='';
+  for(var i=0;i<db.members.length;i++){
+    var m=db.members[i];
+    rows+='<tr>'
+      +'<td>'+(i+1)+'</td>'
+      +'<td>'+(m.photo?'<img src="'+m.photo+'" style="width:36px;height:36px;border-radius:4px;object-fit:cover">':'')+'</td>'
+      +'<td><strong>'+m.nom+' '+m.prenom+'</strong><br><small style="color:#1e3a8a">'+m.id+'</small></td>'
+      +'<td>'+(m.fonction||'')+'</td>'
+      +'<td>'+(m.tel||'')+'</td>'
+      +'<td>'+(m.naiss||'')+'</td>'
+      +'<td>'+(m.adr||'')+'</td>'
+      +'</tr>';
+  }
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Liste Membres - '+cfg.name+'</title>'
+    +'<style>body{font-family:Arial;font-size:12px;padding:20px;}h2{color:#1e3a8a;margin-bottom:4px;}p{color:#888;font-size:11px;margin-bottom:16px;}'
+    +'table{width:100%;border-collapse:collapse;}th{background:#1e3a8a;color:#fff;padding:8px;text-align:left;font-size:11px;}'
+    +'td{padding:7px 8px;border-bottom:1px solid #e2e8f0;vertical-align:middle;font-size:11px;}'
+    +'tr:nth-child(even){background:#f8fafc;}.btn{background:#1e3a8a;color:#fff;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;margin-bottom:16px;font-size:12px;}'
+    +'@media print{.btn{display:none!important;}}</style></head><body>'
+    +'<button class="btn" onclick="window.print()">&#128196; Imprimer / Enregistrer PDF</button>'
+    +'<h2>'+cfg.name+' — Liste des Membres</h2>'
+    +'<p>Genere le '+new Date().toLocaleDateString('fr-FR')+' &bull; '+db.members.length+' membre(s)</p>'
+    +'<table><tr><th>#</th><th>Photo</th><th>Nom / ID</th><th>Fonction</th><th>Tel</th><th>Naissance</th><th>Adresse</th></tr>'
+    +rows+'</table></body></html>');
+  w.document.close();
+}
+document.getElementById('btnExportPDF').addEventListener('click',exportPDF);
+
+// ── CALENDRIER DES PRESENCES ──
+var calYear=new Date().getFullYear(), calMonth=new Date().getMonth();
+function renderCalendar(){
+  var memberFilter=document.getElementById('calMember').value;
+  var actFilter=document.getElementById('calAct').value;
+  var firstDay=new Date(calYear,calMonth,1).getDay();
+  var daysInMonth=new Date(calYear,calMonth+1,0).getDate();
+  var today=new Date().toISOString().split('T')[0];
+  var ym=calYear+'-'+String(calMonth+1).padStart(2,'0');
+  document.getElementById('calMonthTitle').textContent=MOIS[calMonth]+' '+calYear;
+  // Collect presence dates for this month
+  var presDates={};
+  for(var i=0;i<db.attendance.length;i++){
+    var a=db.attendance[i];
+    if((a.date||'').indexOf(ym)!==0) continue;
+    if(memberFilter && String(a.muid)!==memberFilter) continue;
+    if(actFilter && a.act!==actFilter) continue;
+    presDates[a.date]=(presDates[a.date]||0)+1;
+  }
+  var jours=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+  var h='';
+  for(var j=0;j<7;j++) h+='<div class="cal-day-lbl">'+jours[j]+'</div>';
+  for(var blank=0;blank<firstDay;blank++) h+='<div class="cal-day other-month"></div>';
+  for(var d=1;d<=daysInMonth;d++){
+    var dateStr=calYear+'-'+String(calMonth+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    var hasPres=presDates[dateStr]>0;
+    var isToday=dateStr===today;
+    var cls='cal-day'+(hasPres?' has-pres':'')+(isToday?' today':'');
+    var cnt=presDates[dateStr]?'<span class="cal-day-dot" style="background:'+(hasPres?'#fff':'#1e3a8a')+'"></span>':'';
+    h+='<div class="'+cls+'" data-date="'+dateStr+'" data-act="calday" title="'+dateStr+(hasPres?' — '+presDates[dateStr]+' presence(s)':'')+'">'+d+(hasPres&&presDates[dateStr]>1?'<sup style="font-size:0.55rem">'+presDates[dateStr]+'</sup>':'')+'</div>';
+  }
+  document.getElementById('calGrid').innerHTML=h;
+  document.getElementById('calDayDetail').innerHTML='';
+}
+function showCalDay(dateStr){
+  var memberFilter=document.getElementById('calMember').value;
+  var actFilter=document.getElementById('calAct').value;
+  var pres=[];
+  for(var i=0;i<db.attendance.length;i++){
+    var a=db.attendance[i];
+    if(a.date!==dateStr)continue;
+    if(memberFilter && String(a.muid)!==memberFilter)continue;
+    if(actFilter && a.act!==actFilter)continue;
+    pres.push(a);
+  }
+  var el=document.getElementById('calDayDetail');
+  if(!pres.length){el.innerHTML='<div class="empty">Aucune presence le '+dateStr+'</div>';return;}
+  var h='<div style="background:#f0f9ff;border-radius:8px;padding:0.8rem"><div style="font-weight:700;font-size:0.82rem;color:#1e3a8a;margin-bottom:0.5rem">&#128197; '+dateStr+' — '+pres.length+' presence(s)</div>';
+  for(var i=0;i<pres.length;i++) h+='<div style="font-size:0.78rem;padding:0.25rem 0;border-bottom:1px solid #e0f2fe">&#9989; '+pres[i].mname+' &bull; '+pres[i].act+'</div>';
+  h+='</div>';
+  el.innerHTML=h;
+}
+document.getElementById('calPrev').addEventListener('click',function(){calMonth--;if(calMonth<0){calMonth=11;calYear--;}renderCalendar();});
+document.getElementById('calNext').addEventListener('click',function(){calMonth++;if(calMonth>11){calMonth=0;calYear++;}renderCalendar();});
+document.getElementById('calMember').addEventListener('change',renderCalendar);
+document.getElementById('calAct').addEventListener('change',renderCalendar);
+document.addEventListener('click',function(e){if(e.target.getAttribute('data-act')==='calday')showCalDay(e.target.getAttribute('data-date'));});
+
+// Fill calMember when attendance page opens
+var origFillSelects=fillSelects;
+fillSelects=function(){
+  origFillSelects();
+  var opts='<option value="">Tous les membres</option>';
+  for(var i=0;i<db.members.length;i++){var m=db.members[i];opts+='<option value="'+m.uid+'">'+m.nom+' '+m.prenom+'</option>';}
+  var cm=document.getElementById('calMember');if(cm)cm.innerHTML=opts;
+  renderCalendar();
+};
+renderCalendar();
+
+// Render fonctions list when config opens
+var origRenderCfg=renderCfg;
+renderCfg=function(){origRenderCfg();renderFonctionsList();};
+</script>
+</body>
+</html>
