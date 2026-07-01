@@ -1636,7 +1636,8 @@ function goPortalTab(idx){
 }
 
 function loadPortalPres(m){
-  var pres=[];for(var i=0;i<db.attendance.length;i++)if(db.attendance[i].muid===m.uid)pres.push(db.attendance[i]);
+  var pres=[];
+  for(var i=0;i<db.attendance.length;i++) if(String(db.attendance[i].muid)===String(m.uid)) pres.push(db.attendance[i]);
   pres.sort(function(a,b){return(b.date||'').localeCompare(a.date||'');});
   var acts={};for(var i=0;i<pres.length;i++){var a=pres[i].act.split(' - ')[0];acts[a]=(acts[a]||0)+1;}
   var sh='';for(var k in acts)sh+='<div class="sbox"><div class="snum" style="font-size:1.4rem">'+acts[k]+'</div><div class="slbl">'+k+'</div></div>';
@@ -2559,14 +2560,17 @@ loadPortalBooks=function(){
   loadPortalDocs();
 };
 
-// ── LOAD PORTAL OVERRIDE - ajoute dime status au chargement ──
+// ── LOAD PORTAL OVERRIDE ──
 var _origLoadPortal=loadPortal;
 loadPortal=function(m){
-  _origLoadPortal(m);
-  loadPortalDime(m);
-  loadPortalCal();
-  loadPortalBooks();
-  window._curPortalMember=m;
+  // Trouver la version la plus recente du membre dans db
+  var updated=null;
+  for(var i=0;i<db.members.length;i++){
+    if(String(db.members[i].uid)===String(m.uid)){updated=db.members[i];break;}
+  }
+  var member=updated||m;
+  _origLoadPortal(member);
+  window._curPortalMember=member;
 };
 
 // ── SYNC FIREBASE - rafraichit portail si membre connecte ──
