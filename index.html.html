@@ -592,18 +592,6 @@ textarea.finp{resize:vertical;min-height:65px;}
     <div class="brow"><button class="btn bout" id="btnChgFinPin">Enregistrer le PIN</button></div>
   </div>
 
-  <div class="card">
-    <div class="ctitle">&#128197; Programme hebdomadaire</div>
-    <p style="font-size:0.78rem;color:#888;margin-bottom:1rem">Personnalisez les activites visibles dans l espace membre</p>
-    <div class="fgrid">
-      <div class="ffield"><label class="flbl">Jour</label><input type="text" id="newActJour" class="finp" placeholder="Ex: Dimanche"></div>
-      <div class="ffield"><label class="flbl">Heure</label><input type="text" id="newActHeure" class="finp" placeholder="Ex: 9h00"></div>
-    </div>
-    <div class="ffield" style="margin-bottom:0.7rem"><label class="flbl">Activite</label><input type="text" id="newActNom" class="finp" placeholder="Ex: Culte dominical"></div>
-    <div class="brow"><button class="btn bgrn" id="btnAddActivite">&#10010; Ajouter</button></div>
-    <div id="activitesList" style="margin-top:1rem"></div>
-  </div>
-
 </div>
 
 <div id="pg8" class="page">
@@ -826,7 +814,6 @@ function loadDB() {
   try { db.offrandes = JSON.parse(localStorage.getItem('ciga_off') || '[]'); } catch(e) { db.offrandes = []; }
   try { var sc = localStorage.getItem('ciga_cfg'); if(sc) { var p = JSON.parse(sc); if(p.name) cfg.name=p.name; if(p.sub) cfg.sub=p.sub; if(p.tel) cfg.tel=p.tel; if(p.pass) cfg.pass=p.pass; if(p.dash) cfg.dash=Object.assign({membres:true,presenceMois:true,departement:true,livres:true,activites:true,finances:true,autres:''},p.dash); } } catch(e) {}
   db.logo = localStorage.getItem('ciga_logo') || '';
-  try { var av=localStorage.getItem('ciga_activites'); if(av) window._activitesCache=JSON.parse(av); } catch(e) {}
   syncFromFirebase();
 }
 
@@ -843,17 +830,6 @@ function syncFromFirebase() {
       try { localStorage.setItem(lsKeys[i], JSON.stringify(db[key])); } catch(e) {}
       try { goPage(currentPage); } catch(e) {}
     });
-  });
-  // Synchroniser les activites hebdomadaires
-  rtdb.ref('activites').on('value', function(snap) {
-    var val = snap.val();
-    var arr = val ? (Array.isArray(val) ? val : Object.values(val)) : null;
-    if(arr && arr.length) {
-      window._activitesCache = arr;
-      try { localStorage.setItem('ciga_activites', JSON.stringify(arr)); } catch(e) {}
-    }
-    try { if(curMember) loadPortalCal(); } catch(e) {}
-    try { if(currentPage===7) renderActivitesList(); } catch(e) {}
   });
   rtdb.ref('config').on('value', function(snap) {
     var val = snap.val();
@@ -1350,7 +1326,6 @@ function renderCfg(){
   document.getElementById('cfgtel').value=cfg.tel||'';
   if(db.logo) document.getElementById('cfglogoprev').innerHTML='<img src="'+db.logo+'" style="width:55px;height:55px;border-radius:50%;object-fit:cover;border:2px solid #1e3a8a">';
   loadDashCfg();
-  try{renderActivitesList();}catch(e){}
 }
 function saveCfg(){
   var n=document.getElementById('cfgname').value.trim();
@@ -1636,8 +1611,7 @@ function goPortalTab(idx){
 }
 
 function loadPortalPres(m){
-  var pres=[];
-  for(var i=0;i<db.attendance.length;i++) if(String(db.attendance[i].muid)===String(m.uid)) pres.push(db.attendance[i]);
+  var pres=[];for(var i=0;i<db.attendance.length;i++)if(db.attendance[i].muid===m.uid)pres.push(db.attendance[i]);
   pres.sort(function(a,b){return(b.date||'').localeCompare(a.date||'');});
   var acts={};for(var i=0;i<pres.length;i++){var a=pres[i].act.split(' - ')[0];acts[a]=(acts[a]||0)+1;}
   var sh='';for(var k in acts)sh+='<div class="sbox"><div class="snum" style="font-size:1.4rem">'+acts[k]+'</div><div class="slbl">'+k+'</div></div>';
@@ -1690,8 +1664,15 @@ function loadPortalCal(){
   }
   var pevlist=document.getElementById('pevlist');
   if(pevlist)pevlist.innerHTML=h||'';
-  // Programme hebdomadaire - via getActivites (Firebase + cache)
-  var acts=typeof getActivites==='function'?getActivites():[];
+  // Programme hebdomadaire - always from localStorage
+  var acts=[];
+  try{var a=localStorage.getItem('ciga_activites');acts=a?JSON.parse(a):[
+    {jour:'Dimanche',heure:'9h00',nom:'Culte dominical'},
+    {jour:'Mardi',heure:'18h00',nom:'Culte d enseignement'},
+    {jour:'Mercredi',heure:'18h00',nom:'Culte de priere'},
+    {jour:'Vendredi',heure:'18h00',nom:'Intercession'},
+    {jour:'Samedi',heure:'8h00',nom:'Evangelisation'}
+  ];}catch(e){}
   var pActEl=document.getElementById('pActivitesList');
   if(pActEl){
     pActEl.innerHTML=acts.length?acts.map(function(a){
@@ -2500,7 +2481,6 @@ function loadPortalDime(m){
 
 // ── ACTIVITES PERSONNALISABLES ──
 function getActivites(){
-  if(window._activitesCache && window._activitesCache.length) return window._activitesCache;
   try{var a=localStorage.getItem('ciga_activites');return a?JSON.parse(a):[
     {jour:'Dimanche',heure:'9h00',nom:'Culte dominical'},
     {jour:'Mardi',heure:'18h00',nom:'Culte d enseignement'},
@@ -2509,88 +2489,53 @@ function getActivites(){
     {jour:'Samedi',heure:'8h00',nom:'Evangelisation'}
   ];}catch(e){return [];}
 }
-function saveActivites(arr){
-  window._activitesCache=arr;
-  try{localStorage.setItem('ciga_activites',JSON.stringify(arr));}catch(e){}
-  try{if(typeof rtdb!=='undefined'&&rtdb)rtdb.ref('activites').set(arr);}catch(e){}
-}
+function saveActivites(arr){try{localStorage.setItem('ciga_activites',JSON.stringify(arr));}catch(e){}}
 
-function renderActivitesList(){
-  var el=document.getElementById('activitesList');
-  if(!el)return;
-  var arr=getActivites();
-  if(!arr.length){el.innerHTML='<div class="empty">Aucune activite definie</div>';return;}
-  el.innerHTML=arr.map(function(a,i){
-    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0.8rem;background:#f9fafb;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:0.4rem">'
-      +'<div><strong>'+a.jour+'</strong> '+(a.heure?'— '+a.heure:'')+'<div style="font-size:0.78rem;color:#888">'+a.nom+'</div></div>'
-      +'<button class="btn bred bsm" data-actidx="'+i+'" data-act="delActivite">X</button></div>';
-  }).join('');
-}
-
-document.getElementById('btnAddActivite').addEventListener('click',function(){
-  var jour=document.getElementById('newActJour').value.trim();
-  var heure=document.getElementById('newActHeure').value.trim();
-  var nom=document.getElementById('newActNom').value.trim();
-  if(!jour||!nom){toast('Remplissez le jour et l activite');return;}
-  var arr=getActivites();
-  arr.push({jour:jour,heure:heure,nom:nom});
-  saveActivites(arr);
-  renderActivitesList();
-  document.getElementById('newActJour').value='';
-  document.getElementById('newActHeure').value='';
-  document.getElementById('newActNom').value='';
-  toast('Activite ajoutee ✓');
-});
-
-document.addEventListener('click',function(e){
-  if(e.target.getAttribute('data-act')==='delActivite'){
-    var idx=parseInt(e.target.getAttribute('data-actidx'));
-    var arr=getActivites();
-    arr.splice(idx,1);
-    saveActivites(arr);
-    renderActivitesList();
-    toast('Activite supprimee');
-  }
-});
-
-// ── LOADPORTALBOOKS - aussi charger docs ──
+// ── LOADPORTALBBOOKS - show docs too ──
 var _origLoadPortalBooks=loadPortalBooks;
 loadPortalBooks=function(){
   _origLoadPortalBooks();
   loadPortalDocs();
 };
 
+// ── GOPORALTAB with auto-reload ──
+var _origGoPortalTab=goPortalTab;
+goPortalTab=function(idx){
+  _origGoPortalTab(idx);
+  if(idx===4)setTimeout(loadPortalCal,50);
+  if(idx===3)setTimeout(loadPortalBooks,50);
+  if(idx===2&&curMember)setTimeout(function(){loadPortalDime(curMember);},50);
+};
+
 // ── LOAD PORTAL OVERRIDE ──
 var _origLoadPortal=loadPortal;
 loadPortal=function(m){
-  // Trouver la version la plus recente du membre dans db
-  var updated=null;
-  for(var i=0;i<db.members.length;i++){
-    if(String(db.members[i].uid)===String(m.uid)){updated=db.members[i];break;}
-  }
-  var member=updated||m;
-  _origLoadPortal(member);
-  window._curPortalMember=member;
+  _origLoadPortal(m);
+  setTimeout(function(){
+    loadPortalDime(m);
+    loadPortalCal();
+    loadPortalBooks();
+  },200);
+  window._curPortalMember=m;
 };
 
-// ── SYNC FIREBASE - rafraichit portail si membre connecte ──
+// ── SYNC FIREBASE REFRESH PORTAL ──
+var _origSyncFromFirebase=syncFromFirebase;
+syncFromFirebase=function(){
+  _origSyncFromFirebase();
+};
+
+// Override to refresh portal on data change
 setTimeout(function(){
   if(typeof rtdb!=='undefined'&&rtdb){
     ['members','attendance','finances','events','books','docs'].forEach(function(key){
-      try{
-        rtdb.ref(key).on('value',function(){
-          if(curMember){
-            setTimeout(function(){
-              try{
-                loadPortalDime(curMember);
-                loadPortalPres(curMember);
-                loadPortalCal();
-                loadPortalBooks();
-              }catch(e){}
-            },300);
-          }
-        });
-      }catch(e){}
+      try{rtdb.ref(key).on('value',function(){
+        if(curMember){
+          setTimeout(function(){
+            try{loadPortalDime(curMember);loadPortalPres(curMember);loadPortalCal();loadPortalBooks();}catch(e){}
+          },300);
+        }
+      });}catch(e){}
     });
   }
 },2000);
