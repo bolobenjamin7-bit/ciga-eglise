@@ -345,72 +345,122 @@ textarea.finp{resize:vertical;min-height:65px;}
   <div class="fsum" id="fsum"></div>
 
   <!-- ONGLETS FINANCES -->
-  <div style="display:flex;gap:0;margin-bottom:1rem;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0">
-    <button class="fin-tab active" data-ftab="0" style="flex:1;padding:0.5rem;font-size:0.78rem;font-weight:600;cursor:pointer;border:none;background:#1e3a8a;color:#fff">&#128176; Dimes</button>
-    <button class="fin-tab" data-ftab="1" style="flex:1;padding:0.5rem;font-size:0.78rem;font-weight:600;cursor:pointer;border:none;background:#f9fafb;color:#888">&#129309; Offrandes</button>
-    <button class="fin-tab" data-ftab="2" style="flex:1;padding:0.5rem;font-size:0.78rem;font-weight:600;cursor:pointer;border:none;background:#f9fafb;color:#888">&#128197; Depenses</button>
+  <div style="display:flex;flex-wrap:wrap;gap:0;margin-bottom:1rem;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0">
+    <button class="fin-tab active" data-ftab="0" style="flex:1;min-width:60px;padding:0.4rem 0.2rem;font-size:0.72rem;font-weight:600;cursor:pointer;border:none;background:#1e3a8a;color:#fff">&#128176; Dimes</button>
+    <button class="fin-tab" data-ftab="1" style="flex:1;min-width:60px;padding:0.4rem 0.2rem;font-size:0.72rem;font-weight:600;cursor:pointer;border:none;background:#f9fafb;color:#888">&#129309; Offrandes</button>
+    <button class="fin-tab" data-ftab="2" style="flex:1;min-width:60px;padding:0.4rem 0.2rem;font-size:0.72rem;font-weight:600;cursor:pointer;border:none;background:#f9fafb;color:#888">&#128196; Depenses</button>
   </div>
 
   <!-- TAB 0 : DIMES -->
   <div id="ftab0">
     <div class="card" style="border-top:3px solid #16a34a">
-      <div class="ctitle" style="color:#16a34a">&#128176; Dimes du mois</div>
-      <p style="font-size:0.78rem;color:#888;margin-bottom:1rem">Cochez Oui ou Non pour chaque membre</p>
-      <div id="dimeCheckList"></div>
-    </div>
-    <div class="card">
-      <div class="ctitle">Don manuel</div>
+      <div class="ctitle" style="color:#16a34a">&#128176; Enregistrer une dime</div>
       <div class="fgrid">
         <div class="ffield"><label class="flbl">Membre</label><select id="fmem" class="finp"><option value="">Selectionner</option></select></div>
         <div class="ffield"><label class="flbl">Montant (FCFA)</label><input type="number" id="famtin" class="finp" placeholder="5000"></div>
+        <div class="ffield"><label class="flbl">Date</label><input type="date" id="fdimdate" class="finp"></div>
       </div>
-      <div class="brow"><button class="btn bgrn" id="btnaddin">Enregistrer don</button></div>
-    </div>
-  </div>
-
-  <!-- TAB 1 : OFFRANDES PAR DIMANCHE -->
-  <div id="ftab1" style="display:none">
-    <div class="card" style="border-top:3px solid #8b5cf6">
-      <div class="ctitle" style="color:#8b5cf6">&#129309; Offrande du Dimanche</div>
-      <p style="font-size:0.78rem;color:#888;margin-bottom:1rem">Enregistrez le montant de l'offrande collectee chaque dimanche</p>
-      <div class="fgrid">
-        <div class="ffield"><label class="flbl">Date du dimanche</label><input type="date" id="offDate" class="finp"></div>
-        <div class="ffield"><label class="flbl">Montant total (FCFA)</label><input type="number" id="offMontant" class="finp" placeholder="Ex: 150000"></div>
-      </div>
-      <div class="ffield"><label class="flbl">Note (optionnel)</label><input type="text" id="offNote" class="finp" placeholder="Ex: Culte dominical, Evangelisation..."></div>
-      <div class="brow"><button class="btn" style="background:#8b5cf6;color:#fff" id="btnAddOff">+ Enregistrer offrande</button></div>
-    </div>
-    <!-- CALENDRIER OFFRANDES -->
-    <div class="card">
-      <div class="att-cal-hdr">
-        <button class="att-cal-nav" id="offCalPrev">&#8592;</button>
-        <div class="att-cal-title" id="offCalTitle"></div>
-        <button class="att-cal-nav" id="offCalNext">&#8594;</button>
-      </div>
-      <div class="cal-grid" id="offCalGrid" style="margin-top:0.8rem"></div>
-      <div id="offDayDetail" style="margin-top:0.8rem"></div>
+      <div class="brow"><button class="btn bgrn" id="btnaddin">&#128176; Enregistrer</button></div>
     </div>
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem">
-        <div class="ctitle" style="margin:0">Historique offrandes</div>
-        <div id="offTotal" style="font-weight:700;color:#8b5cf6;font-size:0.85rem"></div>
+        <div class="ctitle" style="margin:0;color:#16a34a">&#128202; Historique des dimes</div>
+        <div id="dimeTotal" style="font-weight:700;color:#16a34a;font-size:0.85rem"></div>
       </div>
-      <div id="offList"></div>
+      <div id="dimeList"><div class="empty">Aucune dime enregistree</div></div>
+    </div>
+  </div>
+
+  <!-- TAB 1 : OFFRANDES -->
+  <div id="ftab1" style="display:none">
+    <!-- Sous-onglets offrandes -->
+    <div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:1rem">
+      <button class="off-sub-tab active" data-offtab="0" style="flex:1;min-width:80px;padding:0.4rem;font-size:0.72rem;font-weight:600;cursor:pointer;border:1px solid #8b5cf6;border-radius:6px;background:#8b5cf6;color:#fff">Dimanche</button>
+      <button class="off-sub-tab" data-offtab="1" style="flex:1;min-width:80px;padding:0.4rem;font-size:0.72rem;font-weight:600;cursor:pointer;border:1px solid #e2e8f0;border-radius:6px;background:#f9fafb;color:#888">Cellule</button>
+      <button class="off-sub-tab" data-offtab="2" style="flex:1;min-width:80px;padding:0.4rem;font-size:0.72rem;font-weight:600;cursor:pointer;border:1px solid #e2e8f0;border-radius:6px;background:#f9fafb;color:#888">Enseignement</button>
+    </div>
+
+    <div id="offtab0">
+      <div class="card" style="border-top:3px solid #8b5cf6">
+        <div class="ctitle" style="color:#8b5cf6">&#129309; Offrande du Dimanche</div>
+        <div class="fgrid">
+          <div class="ffield"><label class="flbl">Date</label><input type="date" id="offDate" class="finp"></div>
+          <div class="ffield"><label class="flbl">Montant (FCFA)</label><input type="number" id="offMontant" class="finp" placeholder="Ex: 150000"></div>
+        </div>
+        <div class="ffield"><label class="flbl">Note</label><input type="text" id="offNote" class="finp" placeholder="Ex: Culte dominical..."></div>
+        <div class="brow"><button class="btn" style="background:#8b5cf6;color:#fff" id="btnAddOff">+ Enregistrer</button></div>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem">
+          <div class="ctitle" style="margin:0;color:#8b5cf6">Historique Dimanche</div>
+          <div id="offTotalDim" style="font-weight:700;color:#8b5cf6;font-size:0.85rem"></div>
+        </div>
+        <div id="offList"></div>
+      </div>
+    </div>
+
+    <div id="offtab1" style="display:none">
+      <div class="card" style="border-top:3px solid #0891b2">
+        <div class="ctitle" style="color:#0891b2">&#129309; Offrande de Cellule</div>
+        <div class="fgrid">
+          <div class="ffield"><label class="flbl">Date</label><input type="date" id="offCellDate" class="finp"></div>
+          <div class="ffield"><label class="flbl">Montant (FCFA)</label><input type="number" id="offCellMontant" class="finp" placeholder="5000"></div>
+        </div>
+        <div class="ffield"><label class="flbl">Note</label><input type="text" id="offCellNote" class="finp" placeholder="Ex: Cellule Nord..."></div>
+        <div class="brow"><button class="btn" style="background:#0891b2;color:#fff" id="btnAddOffCell">+ Enregistrer</button></div>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem">
+          <div class="ctitle" style="margin:0;color:#0891b2">Historique Cellule</div>
+          <div id="offTotalCell" style="font-weight:700;color:#0891b2;font-size:0.85rem"></div>
+        </div>
+        <div id="offListCell"></div>
+      </div>
+    </div>
+
+    <div id="offtab2" style="display:none">
+      <div class="card" style="border-top:3px solid #d97706">
+        <div class="ctitle" style="color:#d97706">&#129309; Offrande d Enseignement</div>
+        <div class="fgrid">
+          <div class="ffield"><label class="flbl">Date</label><input type="date" id="offEnsDate" class="finp"></div>
+          <div class="ffield"><label class="flbl">Montant (FCFA)</label><input type="number" id="offEnsMontant" class="finp" placeholder="5000"></div>
+        </div>
+        <div class="ffield"><label class="flbl">Note</label><input type="text" id="offEnsNote" class="finp" placeholder="Ex: Mardi enseignement..."></div>
+        <div class="brow"><button class="btn" style="background:#d97706;color:#fff" id="btnAddOffEns">+ Enregistrer</button></div>
+      </div>
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem">
+          <div class="ctitle" style="margin:0;color:#d97706">Historique Enseignement</div>
+          <div id="offTotalEns" style="font-weight:700;color:#d97706;font-size:0.85rem"></div>
+        </div>
+        <div id="offListEns"></div>
+      </div>
+    </div>
+
+    <!-- Total general offrandes -->
+    <div class="card" style="background:#faf5ff;border:1px solid #e9d5ff">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div class="ctitle" style="margin:0;color:#8b5cf6">&#128200; Total General Offrandes</div>
+        <div id="offTotalGeneral" style="font-weight:800;color:#8b5cf6;font-size:1rem"></div>
+      </div>
     </div>
   </div>
 
   <!-- TAB 2 : DEPENSES -->
   <div id="ftab2" style="display:none">
     <div class="card" style="border-top:3px solid #dc2626">
-      <div class="ctitle" style="color:#dc2626">Depenses</div>
-      <div class="ffield" style="margin-bottom:0.7rem"><label class="flbl">Motif</label><input type="text" id="fmotif" class="finp" placeholder="Ex: Loyer..."></div>
-      <div class="ffield"><label class="flbl">Montant (FCFA)</label><input type="number" id="famtout" class="finp" placeholder="25000"></div>
+      <div class="ctitle" style="color:#dc2626">&#128196; Enregistrer une depense</div>
+      <div class="fgrid">
+        <div class="ffield"><label class="flbl">Nature de la depense</label><input type="text" id="fmotif" class="finp" placeholder="Ex: Loyer, Electricite..."></div>
+        <div class="ffield"><label class="flbl">Montant (FCFA)</label><input type="number" id="famtout" class="finp" placeholder="25000"></div>
+        <div class="ffield"><label class="flbl">Date</label><input type="date" id="fdepdate" class="finp"></div>
+      </div>
       <div class="brow"><button class="btn bred" id="btnaddout">Enregistrer depense</button></div>
     </div>
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.8rem">
-        <div class="ctitle" style="margin:0">Transactions</div>
-        <button class="btn bout bsm" onclick="window.print()">Imprimer</button>
+        <div class="ctitle" style="margin:0;color:#dc2626">&#128202; Historique depenses</div>
+        <div id="depTotal" style="font-weight:700;color:#dc2626;font-size:0.85rem"></div>
       </div>
       <div id="flist"></div>
     </div>
@@ -564,8 +614,7 @@ textarea.finp{resize:vertical;min-height:65px;}
     </div>
   </div>
   <div class="card">
-    <div class="ctitle">&#128203; Historique des connexions</div>
-    <p style="font-size:0.78rem;color:#888;margin-bottom:0.8rem">Qui a visite l'application et quand</p>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem"><div class="ctitle" style="margin:0">&#128203; Historique des connexions</div><button class="btn bred bsm" id="btnClearHistory">&#128465; Supprimer</button></div>
     <div id="loginHistoryList"><div class="empty">Aucune connexion enregistree</div></div>
   </div>
   <div class="card">
@@ -590,6 +639,18 @@ textarea.finp{resize:vertical;min-height:65px;}
       <div class="ffield"><label class="flbl">Confirmer</label><input type="password" id="fp2" class="finp" maxlength="4" placeholder="1234"></div>
     </div>
     <div class="brow"><button class="btn bout" id="btnChgFinPin">Enregistrer le PIN</button></div>
+  </div>
+
+  <div class="card">
+    <div class="ctitle">&#128197; Programme hebdomadaire</div>
+    <p style="font-size:0.78rem;color:#888;margin-bottom:1rem">Personnalisez les activites visibles dans l espace membre</p>
+    <div class="fgrid">
+      <div class="ffield"><label class="flbl">Jour</label><input type="text" id="newActJour" class="finp" placeholder="Ex: Dimanche"></div>
+      <div class="ffield"><label class="flbl">Heure</label><input type="text" id="newActHeure" class="finp" placeholder="Ex: 9h00"></div>
+    </div>
+    <div class="ffield" style="margin-bottom:0.7rem"><label class="flbl">Activite</label><input type="text" id="newActNom" class="finp" placeholder="Ex: Culte dominical"></div>
+    <div class="brow"><button class="btn bgrn" id="btnAddActivite">&#10010; Ajouter</button></div>
+    <div id="activitesList" style="margin-top:1rem"></div>
   </div>
 
 </div>
@@ -814,6 +875,7 @@ function loadDB() {
   try { db.offrandes = JSON.parse(localStorage.getItem('ciga_off') || '[]'); } catch(e) { db.offrandes = []; }
   try { var sc = localStorage.getItem('ciga_cfg'); if(sc) { var p = JSON.parse(sc); if(p.name) cfg.name=p.name; if(p.sub) cfg.sub=p.sub; if(p.tel) cfg.tel=p.tel; if(p.pass) cfg.pass=p.pass; if(p.dash) cfg.dash=Object.assign({membres:true,presenceMois:true,departement:true,livres:true,activites:true,finances:true,autres:''},p.dash); } } catch(e) {}
   db.logo = localStorage.getItem('ciga_logo') || '';
+  try { var av=localStorage.getItem('ciga_activites'); if(av) window._activitesCache=JSON.parse(av); } catch(e) {}
   syncFromFirebase();
 }
 
@@ -824,12 +886,26 @@ function syncFromFirebase() {
     rtdb.ref(key).on('value', function(snap) {
       var val = snap.val();
       if(val) {
-        if(Array.isArray(val)) { db[key] = val; }
-        else { db[key] = Object.values(val); }
+        if(Array.isArray(val)) {
+          db[key] = val.filter(function(x){return x!=null;});
+        } else {
+          db[key] = Object.values(val).filter(function(x){return x!=null;});
+        }
       } else { db[key] = []; }
       try { localStorage.setItem(lsKeys[i], JSON.stringify(db[key])); } catch(e) {}
       try { goPage(currentPage); } catch(e) {}
     });
+  });
+  // Synchroniser les activites hebdomadaires
+  rtdb.ref('activites').on('value', function(snap) {
+    var val = snap.val();
+    var arr = val ? (Array.isArray(val) ? val : Object.values(val)) : null;
+    if(arr && arr.length) {
+      window._activitesCache = arr;
+      try { localStorage.setItem('ciga_activites', JSON.stringify(arr)); } catch(e) {}
+    }
+    try { if(curMember) loadPortalCal(); } catch(e) {}
+    try { if(currentPage===7) renderActivitesList(); } catch(e) {}
   });
   rtdb.ref('config').on('value', function(snap) {
     var val = snap.val();
@@ -953,7 +1029,7 @@ function goPage(idx) {
   if(idx===0) renderDash();
   if(idx===1) renderMembers();
   if(idx===2) { fillSelects(); renderAtt(); }
-  if(idx===3) { fillSelects(); renderFin(); renderDimeList(); }
+  if(idx===3) { fillSelects(); renderFin(); }
   if(idx===4) renderCom();
   if(idx===5) renderEv();
   if(idx===6) renderBooks();
@@ -1326,6 +1402,7 @@ function renderCfg(){
   document.getElementById('cfgtel').value=cfg.tel||'';
   if(db.logo) document.getElementById('cfglogoprev').innerHTML='<img src="'+db.logo+'" style="width:55px;height:55px;border-radius:50%;object-fit:cover;border:2px solid #1e3a8a">';
   loadDashCfg();
+  try{renderActivitesList();}catch(e){}
 }
 function saveCfg(){
   var n=document.getElementById('cfgname').value.trim();
@@ -1611,7 +1688,8 @@ function goPortalTab(idx){
 }
 
 function loadPortalPres(m){
-  var pres=[];for(var i=0;i<db.attendance.length;i++)if(db.attendance[i].muid===m.uid)pres.push(db.attendance[i]);
+  var pres=[];
+  for(var i=0;i<db.attendance.length;i++) if(String(db.attendance[i].muid)===String(m.uid)) pres.push(db.attendance[i]);
   pres.sort(function(a,b){return(b.date||'').localeCompare(a.date||'');});
   var acts={};for(var i=0;i<pres.length;i++){var a=pres[i].act.split(' - ')[0];acts[a]=(acts[a]||0)+1;}
   var sh='';for(var k in acts)sh+='<div class="sbox"><div class="snum" style="font-size:1.4rem">'+acts[k]+'</div><div class="slbl">'+k+'</div></div>';
@@ -1664,15 +1742,8 @@ function loadPortalCal(){
   }
   var pevlist=document.getElementById('pevlist');
   if(pevlist)pevlist.innerHTML=h||'';
-  // Programme hebdomadaire - always from localStorage
-  var acts=[];
-  try{var a=localStorage.getItem('ciga_activites');acts=a?JSON.parse(a):[
-    {jour:'Dimanche',heure:'9h00',nom:'Culte dominical'},
-    {jour:'Mardi',heure:'18h00',nom:'Culte d enseignement'},
-    {jour:'Mercredi',heure:'18h00',nom:'Culte de priere'},
-    {jour:'Vendredi',heure:'18h00',nom:'Intercession'},
-    {jour:'Samedi',heure:'8h00',nom:'Evangelisation'}
-  ];}catch(e){}
+  // Programme hebdomadaire - via getActivites (Firebase + cache)
+  var acts=typeof getActivites==='function'?getActivites():[];
   var pActEl=document.getElementById('pActivitesList');
   if(pActEl){
     pActEl.innerHTML=acts.length?acts.map(function(a){
@@ -1836,6 +1907,15 @@ document.addEventListener('click',function(e){
 });
 
 // Render admin list and history when config page opens
+document.addEventListener('click',function(e){
+  if(e.target.id==='btnClearHistory'){
+    if(confirm('Supprimer tout l\'historique des connexions?')){
+      localStorage.removeItem('ciga_history');
+      renderLoginHistory();toast('Historique supprime');
+    }
+  }
+});
+
 var _origRenderCfg2=renderCfg;
 renderCfg=function(){
   _origRenderCfg2();
@@ -2481,6 +2561,7 @@ function loadPortalDime(m){
 
 // ── ACTIVITES PERSONNALISABLES ──
 function getActivites(){
+  if(window._activitesCache && window._activitesCache.length) return window._activitesCache;
   try{var a=localStorage.getItem('ciga_activites');return a?JSON.parse(a):[
     {jour:'Dimanche',heure:'9h00',nom:'Culte dominical'},
     {jour:'Mardi',heure:'18h00',nom:'Culte d enseignement'},
@@ -2489,53 +2570,88 @@ function getActivites(){
     {jour:'Samedi',heure:'8h00',nom:'Evangelisation'}
   ];}catch(e){return [];}
 }
-function saveActivites(arr){try{localStorage.setItem('ciga_activites',JSON.stringify(arr));}catch(e){}}
+function saveActivites(arr){
+  window._activitesCache=arr;
+  try{localStorage.setItem('ciga_activites',JSON.stringify(arr));}catch(e){}
+  try{if(typeof rtdb!=='undefined'&&rtdb)rtdb.ref('activites').set(arr);}catch(e){}
+}
 
-// ── LOADPORTALBBOOKS - show docs too ──
+function renderActivitesList(){
+  var el=document.getElementById('activitesList');
+  if(!el)return;
+  var arr=getActivites();
+  if(!arr.length){el.innerHTML='<div class="empty">Aucune activite definie</div>';return;}
+  el.innerHTML=arr.map(function(a,i){
+    return '<div style="display:flex;align-items:center;justify-content:space-between;padding:0.6rem 0.8rem;background:#f9fafb;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:0.4rem">'
+      +'<div><strong>'+a.jour+'</strong> '+(a.heure?'— '+a.heure:'')+'<div style="font-size:0.78rem;color:#888">'+a.nom+'</div></div>'
+      +'<button class="btn bred bsm" data-actidx="'+i+'" data-act="delActivite">X</button></div>';
+  }).join('');
+}
+
+document.getElementById('btnAddActivite').addEventListener('click',function(){
+  var jour=document.getElementById('newActJour').value.trim();
+  var heure=document.getElementById('newActHeure').value.trim();
+  var nom=document.getElementById('newActNom').value.trim();
+  if(!jour||!nom){toast('Remplissez le jour et l activite');return;}
+  var arr=getActivites();
+  arr.push({jour:jour,heure:heure,nom:nom});
+  saveActivites(arr);
+  renderActivitesList();
+  document.getElementById('newActJour').value='';
+  document.getElementById('newActHeure').value='';
+  document.getElementById('newActNom').value='';
+  toast('Activite ajoutee ✓');
+});
+
+document.addEventListener('click',function(e){
+  if(e.target.getAttribute('data-act')==='delActivite'){
+    var idx=parseInt(e.target.getAttribute('data-actidx'));
+    var arr=getActivites();
+    arr.splice(idx,1);
+    saveActivites(arr);
+    renderActivitesList();
+    toast('Activite supprimee');
+  }
+});
+
+// ── LOADPORTALBOOKS - aussi charger docs ──
 var _origLoadPortalBooks=loadPortalBooks;
 loadPortalBooks=function(){
   _origLoadPortalBooks();
   loadPortalDocs();
 };
 
-// ── GOPORALTAB with auto-reload ──
-var _origGoPortalTab=goPortalTab;
-goPortalTab=function(idx){
-  _origGoPortalTab(idx);
-  if(idx===4)setTimeout(loadPortalCal,50);
-  if(idx===3)setTimeout(loadPortalBooks,50);
-  if(idx===2&&curMember)setTimeout(function(){loadPortalDime(curMember);},50);
-};
-
 // ── LOAD PORTAL OVERRIDE ──
 var _origLoadPortal=loadPortal;
 loadPortal=function(m){
-  _origLoadPortal(m);
-  setTimeout(function(){
-    loadPortalDime(m);
-    loadPortalCal();
-    loadPortalBooks();
-  },200);
-  window._curPortalMember=m;
+  // Trouver la version la plus recente du membre dans db
+  var updated=null;
+  for(var i=0;i<db.members.length;i++){
+    if(String(db.members[i].uid)===String(m.uid)){updated=db.members[i];break;}
+  }
+  var member=updated||m;
+  _origLoadPortal(member);
+  window._curPortalMember=member;
 };
 
-// ── SYNC FIREBASE REFRESH PORTAL ──
-var _origSyncFromFirebase=syncFromFirebase;
-syncFromFirebase=function(){
-  _origSyncFromFirebase();
-};
-
-// Override to refresh portal on data change
+// ── SYNC FIREBASE - rafraichit portail si membre connecte ──
 setTimeout(function(){
   if(typeof rtdb!=='undefined'&&rtdb){
     ['members','attendance','finances','events','books','docs'].forEach(function(key){
-      try{rtdb.ref(key).on('value',function(){
-        if(curMember){
-          setTimeout(function(){
-            try{loadPortalDime(curMember);loadPortalPres(curMember);loadPortalCal();loadPortalBooks();}catch(e){}
-          },300);
-        }
-      });}catch(e){}
+      try{
+        rtdb.ref(key).on('value',function(){
+          if(curMember){
+            setTimeout(function(){
+              try{
+                loadPortalDime(curMember);
+                loadPortalPres(curMember);
+                loadPortalCal();
+                loadPortalBooks();
+              }catch(e){}
+            },300);
+          }
+        });
+      }catch(e){}
     });
   }
 },2000);
