@@ -123,8 +123,16 @@ textarea.finp{resize:vertical;min-height:65px;}
 #toast.show{transform:translateX(-50%) translateY(0);}
 .empty{text-align:center;padding:2rem;color:#888;font-size:0.85rem;}
 </style>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 </head>
 <body>
+
+<div id="syncscr" style="position:fixed;inset:0;background:#1e3a8a;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:1rem">
+  <div style="width:48px;height:48px;border:4px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite"></div>
+  <div style="font-size:0.9rem" id="syncscrtxt">Connexion aux donnees...</div>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 
 <div id="login-screen">
   <div class="lbox">
@@ -631,7 +639,25 @@ var financeOnlyMode = false;
 var curMember = null;
 var cfmCB = null;
 
+// ── FIREBASE SYNC ──
+var firebaseConfig = {
+  apiKey: "AIzaSyB0y11I0LLDVXA4bREu5023qgZNwBg5N70",
+  authDomain: "ciga-382fb.firebaseapp.com",
+  databaseURL: "https://ciga-382fb-default-rtdb.firebaseio.com",
+  projectId: "ciga-382fb",
+  storageBucket: "ciga-382fb.firebasestorage.app",
+  messagingSenderId: "1082460834519",
+  appId: "1:1082460834519:web:5e0b293911307ba6b33e92"
+};
+var fbApp = null, dbRef = null, fbReady = false, fbFirstSync = false, savingRemote = false, syncTimer = null;
+try {
+  fbApp = firebase.initializeApp(firebaseConfig);
+  dbRef = firebase.database().ref('ciga_data');
+  fbReady = true;
+} catch(e) { fbReady = false; }
+
 function loadDB() {
+  // charge d'abord le cache local pour un demarrage rapide hors-ligne
   try { db.members    = JSON.parse(localStorage.getItem('ciga_m')   || '[]'); } catch(e) { db.members = []; }
   try { db.attendance = JSON.parse(localStorage.getItem('ciga_a')   || '[]'); } catch(e) { db.attendance = []; }
   try { db.finances   = JSON.parse(localStorage.getItem('ciga_f')   || '[]'); } catch(e) { db.finances = []; }
@@ -644,7 +670,7 @@ function loadDB() {
   db.logo = localStorage.getItem('ciga_logo') || '';
 }
 
-function saveDB() {
+function saveLocalCache() {
   try {
     localStorage.setItem('ciga_m',   JSON.stringify(db.members));
     localStorage.setItem('ciga_a',   JSON.stringify(db.attendance));
@@ -657,6 +683,64 @@ function saveDB() {
     localStorage.setItem('ciga_cfg', JSON.stringify(cfg));
     if(db.logo) localStorage.setItem('ciga_logo', db.logo);
   } catch(e) {}
+}
+
+function saveDB() {
+  saveLocalCache();
+  if(!fbReady||!dbRef) return;
+  savingRemote = true;
+  try {
+    dbRef.set({ db: db, cfg: cfg }, function(){ savingRemote = false; });
+  } catch(e) { savingRemote = false; }
+}
+
+function startFirebaseSync() {
+  if(!fbReady||!dbRef) { finishBoot(); return; }
+  var bootTimeout = setTimeout(function(){ if(!fbFirstSync) finishBoot(); }, 6000);
+  dbRef.on('value', function(snap){
+    var v = snap.val();
+    if(v){
+      if(v.db){ for(var k in v.db) if(v.db.hasOwnProperty(k)) db[k]=v.db[k]; }
+      if(v.cfg){ for(var k in v.cfg) if(v.cfg.hasOwnProperty(k)) cfg[k]=v.cfg[k]; }
+      saveLocalCache();
+    } else if(!fbFirstSync) {
+      // Base vide: on y pousse les donnees locales/par defaut pour initialiser
+      dbRef.set({ db: db, cfg: cfg });
+    }
+    if(!fbFirstSync){ fbFirstSync=true; clearTimeout(bootTimeout); finishBoot(); }
+    else if(!savingRemote){ refreshLiveViews(); }
+  }, function(){ if(!fbFirstSync) finishBoot(); });
+}
+
+function finishBoot(){
+  document.getElementById('attdate').value = new Date().toISOString().split('T')[0];
+  renderDocs();
+  fillFonctionSelects();
+  document.getElementById('syncscr').style.display='none';
+}
+
+function refreshLiveViews(){
+  fillFonctionSelects();
+  if(document.getElementById('mportal').classList.contains('open') && curMember){
+    var fresh=null; for(var i=0;i<db.members.length;i++) if(db.members[i].uid===curMember.uid){fresh=db.members[i];break;}
+    if(fresh){ curMember=fresh; loadPortal(fresh); } else { closePortal(); }
+    return;
+  }
+  if(document.getElementById('app-content').classList.contains('hide')) return;
+  for(var i=0;i<8;i++){
+    var pg=document.getElementById('pg'+i);
+    if(pg && pg.classList.contains('active')){
+      if(i===0) renderDash();
+      else if(i===1) renderMembers();
+      else if(i===2) renderAtt();
+      else if(i===3) renderFin();
+      else if(i===4) renderCom();
+      else if(i===5) renderEv();
+      else if(i===6){ renderBooks(); renderDocs(); }
+      else if(i===7){ renderFonctionList(); renderProgList(); renderLoginHistory(); }
+      break;
+    }
+  }
 }
 
 function toast(msg) {
@@ -1649,9 +1733,7 @@ function loadPortalCal(){
 
 // ── INIT & EVENTS ──
 loadDB();
-document.getElementById('attdate').value = new Date().toISOString().split('T')[0];
-renderDocs();
-fillFonctionSelects();
+startFirebaseSync();
 
 document.getElementById('loginbtn').addEventListener('click', function(){
   var u=document.getElementById('iuser').value.trim();
